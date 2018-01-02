@@ -26,7 +26,8 @@
         "cweagans/composer-patches": "^1.6.4",
         "drupal-composer/drupal-scaffold": "^2.0.0",
         "oomphinc/composer-installers-extender": "^1.1",
-        "drush/drush": "^9"
+        "drush/drush": "^9",
+        "composer/composer": "^1.5"
     },
     "repositories": {
         "drupal": {
@@ -38,13 +39,18 @@
             "url": "https://asset-packagist.org"
         }
     },
+    "autoload": {
+      "classmap": ["Lightning.php"]
+    },
     "scripts": {
       "post-install-cmd": [
+        "@composer push",
         "@composer drupal-scaffold",
         "PhantomInstaller\\Installer::installPhantomJS"
       ],
       "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
-      "nuke": "rm -r -f docroot vendor"
+      "nuke": "rm -r -f docroot vendor",
+      "push": "Lightning::push"
     },
     "extra": {
       "installer-types": [
