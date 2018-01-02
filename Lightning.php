@@ -1,7 +1,7 @@
 <?php
 
+use Composer\Installers\DrupalInstaller;
 use Composer\IO\IOInterface;
-use Composer\Package\RootPackageInterface;
 use Composer\Script\Event;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -9,11 +9,11 @@ use Symfony\Component\Finder\Finder;
 final class Lightning
 {
     /**
-     * The root package.
+     * The destination directory.
      *
-     * @var RootPackageInterface
+     * @var string
      */
-    protected $package;
+    protected $destination;
 
     /**
      * The I/O handler.
@@ -25,15 +25,32 @@ final class Lightning
     /**
      * Lightning constructor.
      *
-     * @param RootPackageInterface $package
-     *   The root package.
+     * @param string $destination
+     *   The destination directory.
      * @param IOInterface $io
      *   The I/O handler.
      */
-    public function __construct (RootPackageInterface $package, IOInterface $io)
+    public function __construct ($destination, IOInterface $io)
     {
-        $this->package = $package;
+        $this->destination = $destination;
         $this->io = $io;
+    }
+
+    /**
+     * Creates a DrupalInstaller for the root package.
+     *
+     * @param Event $event
+     * @return DrupalInstaller
+     */
+    protected static function getInstaller(Event $event)
+    {
+        $composer = $event->getComposer();
+
+        return new DrupalInstaller(
+            $composer->getPackage(),
+            $composer,
+            $event->getIO()
+        );
     }
 
     /**
@@ -44,8 +61,10 @@ final class Lightning
      */
     public static function push (Event $event)
     {
+        $package = $event->getComposer()->getPackage();
+
         $handler = new static(
-            $event->getComposer()->getPackage(),
+            static::getInstaller($event)->getInstallPath($package, 'drupal'),
             $event->getIO()
         );
         $handler->doPush();
@@ -53,27 +72,8 @@ final class Lightning
 
     protected function doPush ()
     {
-        $extra = $this->package->getExtra();
-
-        $destination = NULL;
-        foreach ($extra['installer-paths'] as $path => $criteria)
-        {
-            if (in_array('type:' . $this->package->getType(), $criteria, TRUE) || in_array($this->package->getName(), $criteria, TRUE))
-            {
-                $destination = $path;
-                break;
-            }
-        }
-        if (empty($destination))
-        {
-            return $this->io->writeError("Could not determine the destination directory.");
-        }
-
-        list (, $extension) = explode('/', $this->package->getName(), 2);
-        $destination = str_replace('{$name}', $extension, $destination);
-
         $file_system = new Filesystem();
-        $file_system->mkdir($destination);
+        $file_system->mkdir($this->destination);
 
         $finder = new Finder();
         $finder
@@ -88,13 +88,13 @@ final class Lightning
             return;
         }
 
-        $this->io->write("Copying $count file(s) to $destination...");
+        $this->io->write("Copying $count file(s) to $this->destination...");
 
         foreach ($finder as $file)
         {
             $path = $file->getPathname();
             // Replace the initial ./ with the destination path.
-            $copy_to = preg_replace('/^\.\//', "$destination/", $path);
+            $copy_to = preg_replace('/^\.\//', $this->destination . '/', $path);
             $file_system->copy($path, $copy_to);
             $this->io->write($path);
         }
