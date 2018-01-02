@@ -29,7 +29,7 @@ class RoboFile extends Tasks
                     ->arg($profile)
                     ->option('yes')
                     ->option('account-pass', 'admin')
-                    ->option('db-url', $db_url)
+                    ->option('db-url', stripslashes($db_url))
             );
 
         /** @var Finder $finder */

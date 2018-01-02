@@ -28,7 +28,8 @@
         "drupal-composer/drupal-scaffold": "^2.0.0",
         "oomphinc/composer-installers-extender": "^1.1",
         "drush/drush": "^9",
-        "composer/composer": "^1.5"
+        "composer/composer": "^1.5",
+        "drupal/lightning_core": "^1.0"
     },
     "repositories": {
         "drupal": {

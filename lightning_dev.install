@@ -12,7 +12,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\lightning_core\ConfigHelper as Config;
-use Drupal\media\Entity\MediaType;
 use Drupal\scheduled_updates\Entity\ScheduledUpdateType;
 use Drupal\views\Entity\View;
 
@@ -20,64 +19,60 @@ use Drupal\views\Entity\View;
  * Implements hook_install().
  */
 function lightning_dev_install() {
-  \Drupal::configFactory()
-    ->getEditable('system.performance')
+  $config_factory = \Drupal::configFactory();
+
+  $config_factory->getEditable('system.performance')
     ->set('css.preprocess', FALSE)
     ->set('js.preprocess', FALSE)
     ->save();
 
-  \Drupal::configFactory()
-    ->getEditable('system.logging')
+  $config_factory->getEditable('system.logging')
     ->set('error_level', ERROR_REPORTING_DISPLAY_ALL)
     ->save();
 
   // Set up Media Entity Twitter to use Twitter's API for thumbnail generation.
-  /** @var \Drupal\media\MediaTypeInterface $tweet_bundle */
-  $tweet_bundle = MediaType::load('tweet');
-  $configuration = array_merge($tweet_bundle->get('source_configuration'), [
-    'use_twitter_api' => TRUE,
-    'consumer_key' => 'EOPhWrgHCRnCB9cGualb1UVBM',
-    'consumer_secret' => 'AX5w9QYDvUJWdD0y0g2EtG3tFIZC9Lg4kR21iaAYakkPG8YKIp',
-    'oauth_access_token' => '52258222-ICStkPK2QcFN5d7v1FKJ1BMnqqPuuJnLIDr12Jsjs',
-    'oauth_access_token_secret' => 'Z4qff1DPLhqxHwei0jXgsnU0xdBFET4wSpQYn6Si3G3lF',
-    'generate_thumbnails' => TRUE,
-  ]);
-  $tweet_bundle->set('source_configuration', $configuration)->save();
+  $config_factory->getEditable('media.type.tweet')
+    ->set('source_configuration.use_twitter_api', TRUE)
+    ->set('source_configuration.consumer_key', 'EOPhWrgHCRnCB9cGualb1UVBM')
+    ->set('source_configuration.consumer_secret', 'AX5w9QYDvUJWdD0y0g2EtG3tFIZC9Lg4kR21iaAYakkPG8YKIp')
+    ->set('source_configuration.oauth_access_token', '52258222-ICStkPK2QcFN5d7v1FKJ1BMnqqPuuJnLIDr12Jsjs')
+    ->set('source_configuration.oauth_access_token_secret', 'Z4qff1DPLhqxHwei0jXgsnU0xdBFET4wSpQYn6Si3G3lF')
+    ->set('source_configuration.generate_thumbnails', TRUE)
+    ->save();
 
   // Sentence-case the label of the media browser's embed code widget. Yes, not
   // doing this can cause tests to fail.
-  $entity_browser = EntityBrowser::load('media_browser');
-  $widgets = $entity_browser->get('widgets');
-  $widgets['8b142f33-59d1-47b1-9e3a-4ae85d8376fa']['label'] = 'Create embed';
-  $entity_browser->set('widgets', $widgets);
-  $entity_browser->save();
+  $config_factory->getEditable('entity_browser.browser.media_browser')
+    ->set('widgets.8b142f33-59d1-47b1-9e3a-4ae85d8376fa.label', 'Create embed')
+    ->save();
 
-  $image_styles = array_map(
-    function ($crop_type) {
-      return 'crop_' . $crop_type;
-    },
-    \Drupal::entityQuery('crop_type')->execute()
-  );
-  $image_styles = ImageStyle::loadMultiple($image_styles);
-
-  /** @var ImageStyle $image_style */
-  foreach ($image_styles as $image_style) {
-    $effects = $image_style->getEffects();
-    $configuration = $effects->getConfiguration();
-    $effect = array_shift($configuration);
-    $effect['uuid'] = 'crop';
-    $effects->setConfiguration(['crop' => $effect]);
-    $image_style->save();
-  }
-
-  \Drupal::configFactory()
-    ->getEditable('lightning_api.settings')
+  $config_factory->getEditable('lightning_api.settings')
     ->set('entity_json', TRUE)
     ->set('bundle_docs', TRUE)
     ->save();
 
   // Expose the moderation_history view in the UI.
   lightning_dev_update_8009();
+
+  if (\Drupal::moduleHandler()->moduleExists('crop')) {
+    $image_styles = array_map(
+      function ($crop_type) {
+        return 'crop_' . $crop_type;
+      },
+      \Drupal::entityQuery('crop_type')->execute()
+    );
+    $image_styles = ImageStyle::loadMultiple($image_styles);
+
+    /** @var ImageStyle $image_style */
+    foreach ($image_styles as $image_style) {
+      $effects = $image_style->getEffects();
+      $configuration = $effects->getConfiguration();
+      $effect = array_shift($configuration);
+      $effect['uuid'] = 'crop';
+      $effects->setConfiguration(['crop' => $effect]);
+      $image_style->save();
+    }
+  }
 }
 
 /**
