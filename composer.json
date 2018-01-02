@@ -40,7 +40,7 @@
         }
     },
     "autoload": {
-      "classmap": ["Lightning.php"]
+      "classmap": ["Commands/"]
     },
     "scripts": {
       "post-install-cmd": [
@@ -50,7 +50,8 @@
       ],
       "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
       "nuke": "rm -r -f docroot vendor",
-      "push": "Lightning::push"
+      "pull": "Acquia\\Lightning\\Commands\\FileCommands::pull",
+      "push": "Acquia\\Lightning\\Commands\\FileCommands::push"
     },
     "extra": {
       "installer-types": [
