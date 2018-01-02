@@ -19,7 +19,8 @@
         "se/selenium-server-standalone": "^2.53",
         "jakoch/phantomjs-installer": "1.9.8",
         "drupal/coder": "~8.2.0",
-        "drupal/devel": "^1.0"
+        "drupal/devel": "^1.0",
+        "consolidation/robo": "^1.2"
     },
     "require-dev": {
         "drupal/core": "~8.4.3",
@@ -42,6 +43,9 @@
     "autoload": {
       "classmap": ["Commands/"]
     },
+    "bin": [
+      "lightning"
+    ],
     "scripts": {
       "post-install-cmd": [
         "@composer push",
