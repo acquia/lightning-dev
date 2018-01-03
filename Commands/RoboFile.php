@@ -54,4 +54,27 @@ class RoboFile extends Tasks
         }
         return $tasks;
     }
+
+    public function configureCloud ($subscription = 'lightningnightly')
+    {
+        $settings = 'docroot/sites/default/settings.php';
+        $site_dir = dirname($settings);
+
+        return $this->collectionBuilder()
+            ->addTask(
+                $this->taskFilesystemStack()
+                    ->mkdir('config/default')
+                    ->touch('config/default/.gitkeep')
+                    ->copy("$site_dir/default.settings.php", $settings, TRUE)
+            )
+            ->addTask(
+                $this->taskWriteToFile($settings)
+                    ->append()
+                    ->lines([
+                        "if (file_exists('/var/www/site-php')) {",
+                        "  require '/var/www/site-php/$subscription/$subscription-settings.inc';",
+                        "}",
+                    ])
+            );
+    }
 }
