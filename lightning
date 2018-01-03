@@ -8,13 +8,16 @@ if ($phar)
 }
 else
 {
-    if (file_exists(__DIR__ . '/vendor/autoload.php'))
+    // Running in the Drupal root.
+    if (file_exists('autoload.php'))
     {
-        require_once __DIR__ . '/vendor/autoload.php';
+        require_once 'autoload.php';
     }
-    elseif (file_exists(__DIR__ . '/../../autoload.php'))
+
+    // Running in the repository root.
+    else if (file_exists('vendor/autoload.php'))
     {
-        require_once __DIR__ . '/../../autoload.php';
+        require_once 'vendor/autoload.php';
     }
 }
 
