@@ -18,7 +18,7 @@ class RoboFile extends Tasks
      */
     protected function taskDrush ($command)
     {
-        return $this->taskExec('../vendor/bin/drush')->rawArg($command)->dir('docroot');
+        return $this->taskExec('vendor/bin/drush')->rawArg($command);
     }
 
     public function install ($db_url, $profile = 'lightning')
