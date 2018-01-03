@@ -4,6 +4,7 @@ namespace Acquia\Lightning\Commands;
 
 use Robo\Tasks;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 
 class RoboFile extends Tasks
 {
@@ -38,13 +39,18 @@ class RoboFile extends Tasks
         foreach ($finder as $file)
         {
             $extension = $file->getBasename('.info.yml');
+            $info = Yaml::parse($file->getContents());
             break;
         }
-        if (isset($extension) && $extension !== $profile)
+
+        if (isset($extension, $info) && $extension !== $profile)
         {
-            $tasks->addTask(
-              $this->taskDrush('pm-enable')->arg($extension)->option('yes')
-            );
+          $install = isset($info['components']) ? $info['components'] : [];
+          array_push($install, $extension);
+
+          $tasks->addTask(
+            $this->taskDrush('pm-enable')->args($install)->option('yes')
+          );
         }
         return $tasks;
     }
