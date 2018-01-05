@@ -27,7 +27,8 @@ default:
       drush:
         alias: self
       subcontexts:
-        autoload: false
+        paths:
+          - '%paths.base%/subcontexts'
       selectors:
         error_message_selector: '.messages [role="alert"]'
         warning_message_selector: '.messages--warning'
