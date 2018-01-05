@@ -2,6 +2,7 @@
 
 namespace Acquia\Lightning\Commands;
 
+use Drupal\Component\Utility\NestedArray;
 use Robo\Tasks;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -76,5 +77,40 @@ class RoboFile extends Tasks
                         "}",
                     ])
             );
+    }
+
+    public function configureBehat ($base_url = 'http://127.0.0.1')
+    {
+        $configuration = [];
+
+        /** @var Finder $partials */
+        $partials = Finder::create()
+            ->in('docroot')
+            ->files()
+            ->name('behat.partial.yml');
+
+        foreach ($partials as $partial)
+        {
+            $partial = str_replace('%paths.base%', $partial->getPath(), $partial->getContents());
+
+            $configuration = NestedArray::mergeDeep($configuration, Yaml::parse($partial));
+        }
+
+        if ($configuration)
+        {
+            $configuration = str_replace(
+                [
+                    '%base_url%',
+                    '%drupal_root%',
+                ],
+                [
+                    $base_url,
+                    'docroot',
+                ],
+                Yaml::dump($configuration)
+            );
+
+            return $this->taskWriteToFile('.behat.yml')->text($configuration);
+        }
     }
 }
