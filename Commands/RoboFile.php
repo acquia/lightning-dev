@@ -91,7 +91,11 @@ class RoboFile extends Tasks
 
         foreach ($partials as $partial)
         {
-            $partial = str_replace('%paths.base%', $partial->getPath(), $partial->getContents());
+            $partial = str_replace(
+                '%paths.base%',
+                $partial->getPathInfo()->getRealPath(),
+                $partial->getContents()
+            );
 
             $configuration = NestedArray::mergeDeep($configuration, Yaml::parse($partial));
         }
