@@ -6,6 +6,23 @@ use Drupal\DrupalExtension\Context\MinkContext;
 trait AwaitTrait {
 
   /**
+   * Waits for a JavaScript condition to become true.
+   *
+   * @param string $expression
+   *   The JavaScript expression to wait for.
+   * @param int $timeout
+   *   (optional) How long, in seconds, to wait before timing out.
+   */
+  protected function awaitExpression($expression, $timeout = 10) {
+    try {
+      $this->getSession()->wait($timeout * 1000, $expression);
+    }
+    catch (UnsupportedDriverActionException $e) {
+      sleep($timeout);
+    }
+  }
+
+  /**
    * Waits for an element to exist.
    *
    * @param string $selector
@@ -18,13 +35,7 @@ trait AwaitTrait {
    */
   protected function awaitElement($selector, $timeout = 10) {
     $js = 'document.querySelector("' . addslashes($selector) . '")';
-
-    try {
-      $this->getSession()->wait($timeout * 1000, $js);
-    }
-    catch (UnsupportedDriverActionException $e) {
-      sleep($timeout);
-    }
+    $this->awaitExpression($js, $timeout);
 
     return $this->assertSession()->elementExists('css', $selector);
   }
