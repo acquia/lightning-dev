@@ -1,11 +1,58 @@
 <?php
 
+use Behat\Gherkin\Node\TableNode;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
 /**
  * Contains miscellaneous step definitions for working with Drupal entities.
  */
 class EntityContext extends DrupalSubContextBase {
+
+  /**
+   * IDs of entities created during the scenario, divided into sets keyed by
+   * entity type ID.
+   *
+   * @var array
+   */
+  protected $entities = [];
+
+  /**
+   * Creates a set of entities from tabular data.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param \Behat\Gherkin\Node\TableNode $table
+   *   The table of entity data.
+   *
+   * @Given :entity_type entities:
+   */
+  public function createMultiple($entity_type, TableNode $table) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+    foreach ($table as $values) {
+      $entity = $storage->create($values);
+      $entity->save();
+      $this->entities[$entity_type][] = $entity->id();
+    }
+  }
+
+  /**
+   * Deletes entities created during the scenario.
+   *
+   * @afterScenario
+   */
+  public function tearDown() {
+    foreach ($this->entities as $entity_type => $entities) {
+      /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
+      $entities = \Drupal::entityTypeManager()
+        ->getStorage($entity_type)
+        ->loadMultiple($entities);
+
+      foreach ($entities as $entity) {
+        $entity->delete();
+      }
+    }
+  }
 
   /**
    * Visits a randomly chosen entity of a specific type and (optional) bundle.
