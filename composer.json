@@ -42,10 +42,7 @@
         }
     },
     "autoload": {
-      "classmap": [
-        "Commands/",
-        "tests/contexts/AwaitTrait.inc"
-      ]
+      "classmap": ["Commands/"]
     },
     "bin": [
       "lightning"
