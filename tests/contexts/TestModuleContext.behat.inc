@@ -1,7 +1,5 @@
 <?php
 
-namespace Acquia\LightningExtension\Context;
-
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\ScenarioScope;
