@@ -6,6 +6,30 @@ use Drupal\DrupalExtension\Context\MinkContext;
 trait AwaitTrait {
 
   /**
+   * Waits for an element to exist.
+   *
+   * @param string $selector
+   *   The element's CSS selector.
+   * @param int $timeout
+   *   (optional) How long, in seconds, to wait before timing out.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The awaited element.
+   */
+  protected function awaitElement($selector, $timeout = 10) {
+    $js = 'document.querySelector("' . addslashes($selector) . '")';
+
+    try {
+      $this->getSession()->wait($timeout * 1000, $js);
+    }
+    catch (UnsupportedDriverActionException $e) {
+      sleep($timeout);
+    }
+
+    return $this->assertSession()->elementExists('css', $selector);
+  }
+
+  /**
    * Waits for AJAX to finish.
    *
    * If the Mink context is unavailable, or the current driver does not support
