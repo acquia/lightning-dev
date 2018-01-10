@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
@@ -28,6 +29,20 @@ class ElementContext extends DrupalSubContextBase {
     if (trim($content)) {
       throw new ExpectationException("Expected element '$selector' to be empty, but it is not.", $this->getSession()->getDriver());
     }
+  }
+
+  /**
+   * Clears a field.
+   *
+   * @param string $field
+   *   The field to clear.
+   * @param ElementInterface $container
+   *   (optional) The element that contains the field.
+   *
+   * @When I clear :field
+   */
+  public function clearField($field, ElementInterface $container = NULL) {
+    $this->assertSession()->fieldExists($field, $container)->setValue(FALSE);
   }
 
 }
