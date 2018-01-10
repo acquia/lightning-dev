@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
@@ -57,6 +58,38 @@ class ElementContext extends DrupalSubContextBase {
    */
   public function assertFieldNotExists($field) {
     $this->assertSession()->fieldNotExists($field);
+  }
+
+  /**
+   * Asserts that a select list has a particular option.
+   *
+   * @param string $select
+   *   The select list to check.
+   * @param string $option
+   *   The option to look for.
+   *
+   * @Then the :select field should have a(n) :option option
+   */
+  public function assertOption($select, $option) {
+    $assert = $this->assertSession();
+    $select = $assert->fieldExists($select);
+    $assert->elementExists('named', ['option', $option], $select);
+  }
+
+  /**
+   * Asserts that a select list has a set of options.
+   *
+   * @param string $select
+   *   The select list to check.
+   * @param \Behat\Gherkin\Node\PyStringNode $options
+   *   The options to look for.
+   *
+   * @Then the :select field should have options:
+   */
+  public function assertOptions($select, PyStringNode $options) {
+    foreach ($options->getStrings() as $option) {
+      $this->assertOption($select, $option);
+    }
   }
 
 }
