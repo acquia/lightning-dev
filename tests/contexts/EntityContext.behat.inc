@@ -14,7 +14,7 @@ class EntityContext extends DrupalSubContextBase {
    *
    * @var array
    */
-  protected $entities = [];
+  protected $trash = [];
 
   /**
    * Creates a set of entities from tabular data.
@@ -32,7 +32,7 @@ class EntityContext extends DrupalSubContextBase {
     foreach ($table as $values) {
       $entity = $storage->create($values);
       $entity->save();
-      $this->entities[$entity_type][] = $entity->id();
+      $this->trash[$entity_type][] = $entity->id();
     }
   }
 
@@ -42,11 +42,11 @@ class EntityContext extends DrupalSubContextBase {
    * @afterScenario
    */
   public function tearDown() {
-    foreach ($this->entities as $entity_type => $entities) {
+    foreach ($this->trash as $entity_type => $IDs) {
       /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
       $entities = \Drupal::entityTypeManager()
         ->getStorage($entity_type)
-        ->loadMultiple($entities);
+        ->loadMultiple($IDs);
 
       foreach ($entities as $entity) {
         $entity->delete();
@@ -88,6 +88,31 @@ class EntityContext extends DrupalSubContextBase {
     else {
       $label = $storage->getEntityType()->getPluralLabel();
       throw new \Exception("There are no $bundle $label available.");
+    }
+  }
+
+  /**
+   * Marks recently created entities to be deleted after the test scenario.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param int $n
+   *   (optional) How many entities to delete.
+   *
+   * @When I delete the latest :entity_type
+   * @When I delete the latest :entity_type entity
+   * @When I delete the latest :n :entity_type entities
+   */
+  public function trashNewest($entity_type, $n = 1) {
+    $items = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->getQuery()
+      ->sort('created', 'DESC')
+      ->range(0, $n)
+      ->execute();
+
+    foreach ($items as $id) {
+      $this->trash[$entity_type][] = $id;
     }
   }
 
