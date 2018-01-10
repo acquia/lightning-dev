@@ -47,6 +47,23 @@ class ElementContext extends DrupalSubContextBase {
   }
 
   /**
+   * Asserts that a form field is present.
+   *
+   * Oddly, MinkContext does not appear to provide a step definition for this.
+   *
+   * @param string $field
+   *   The field locator.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The form field element.
+   *
+   * @Then I should see a(n) :field field
+   */
+  public function assertField($field) {
+    return $this->assertSession()->fieldExists($field);
+  }
+
+  /**
    * Asserts that a form field is not present.
    *
    * Oddly, MinkContext does not appear to provide a step definition for this.
@@ -56,7 +73,7 @@ class ElementContext extends DrupalSubContextBase {
    *
    * @Then I should not see a(n) :field field
    */
-  public function assertFieldNotExists($field) {
+  public function assertNoField($field) {
     $this->assertSession()->fieldNotExists($field);
   }
 
@@ -71,9 +88,8 @@ class ElementContext extends DrupalSubContextBase {
    * @Then the :select field should have a(n) :option option
    */
   public function assertOption($select, $option) {
-    $assert = $this->assertSession();
-    $select = $assert->fieldExists($select);
-    $assert->elementExists('named', ['option', $option], $select);
+    $this->assertSession()
+      ->elementExists('named', ['option', $option], $this->assertField($select));
   }
 
   /**
