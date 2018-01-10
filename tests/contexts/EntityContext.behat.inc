@@ -116,4 +116,18 @@ class EntityContext extends DrupalSubContextBase {
     }
   }
 
+  /**
+   * Visits the edit form for an entity.
+   *
+   * @see lightning_dev_local_tasks_alter()
+   *
+   * @When I visit the edit form
+   */
+  public function edit() {
+    $this
+      ->assertSession()
+      ->elementExists('named', ['link', 'edit-form'])
+      ->click();
+  }
+
 }

@@ -5,6 +5,13 @@ use Drupal\user\Entity\Role;
 use Drupal\workflows\Entity\Workflow;
 
 /**
+ * Implements hook_local_tasks_alter().
+ */
+function lightning_dev_local_tasks_alter(array &$local_tasks) {
+  $local_tasks['entity.node.edit_form']['options']['attributes']['rel'] = 'edit-form';
+}
+
+/**
  * Implements hook_modules_installed().
  */
 function lightning_dev_modules_installed(array $modules) {
