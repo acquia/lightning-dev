@@ -5,7 +5,7 @@ use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup as Plural;
 use Drupal\DrupalExtension\Context\DrupalContext;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
-use Drupal\DrupalExtension\Hook\Scope\AfterNodeCreateScope;
+use Drupal\DrupalExtension\Hook\Scope\BeforeNodeCreateScope;
 
 /**
  * Contains miscellaneous step definitions for working with Drupal entities.
@@ -210,9 +210,9 @@ class EntityContext extends DrupalSubContextBase {
   /**
    * Reacts when a node is created by Drupal Extension's step definition.
    *
-   * @afterNodeCreate
+   * @beforeNodeCreate
    */
-  public function onNodeCreate(AfterNodeCreateScope $scope) {
+  public function onNodeCreate(BeforeNodeCreateScope $scope) {
     $node = $scope->getEntity();
 
     if (! isset($node->uid)) {
