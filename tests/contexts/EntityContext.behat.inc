@@ -154,10 +154,8 @@ class EntityContext extends DrupalSubContextBase {
    * @throws \Behat\Mink\Exception\ExpectationException if the number of
    * existing entities does not match the expected number.
    *
-   * @Then a(n) :entity_type entity should exist
-   * @Then a(n) :bundle :entity_type entity should exist
-   * @Then :n :entity_type entities should exist
-   * @Then :n :bundle :entity_type entities should exist
+   * @Then :n :entity_type entit(y|ies) should exist
+   * @Then :n :bundle :entity_type entit(y|ies) should exist
    */
   public function assertCount($entity_type, $n = 1, $bundle = NULL) {
     $count = $this->count($entity_type, $bundle);
@@ -170,21 +168,6 @@ class EntityContext extends DrupalSubContextBase {
       );
       throw new ExpectationException($message, $this->getSession()->getDriver());
     }
-  }
-
-  /**
-   * Asserts that no entities of a specific type and optional bundle exist.
-   *
-   * @param string $entity_type
-   *   The entity type ID.
-   * @param string $bundle
-   *   (optional) The bundle.
-   *
-   * @Then no :entity_type entities should exist
-   * @Then no :bundle :entity_type entities should exist
-   */
-  public function assertNone($entity_type, $bundle = NULL) {
-    $this->assertCount($entity_type, 0, $bundle);
   }
 
   /**
@@ -205,8 +188,8 @@ class EntityContext extends DrupalSubContextBase {
 
     return (string) new Plural(
       (int) $n,
-      $entity_type->getSingularLabel(),
-      $entity_type->getPluralLabel()
+      '@count ' . $entity_type->getSingularLabel(),
+      '@count' . $entity_type->getPluralLabel()
     );
   }
 
