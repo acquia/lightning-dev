@@ -363,4 +363,27 @@ class ElementContext extends DrupalSubContextBase {
       ->executeScript('document.querySelector("' . addslashes($selector) . '").scrollIntoView()');
   }
 
+  /**
+   * Asserts that a minimum number of elements match a CSS selector.
+   *
+   * @param string $selector
+   *   The selector.
+   * @param int $n
+   *   The number of elements expected to match the selector.
+   *
+   * @throws ExpectationException if the number of elements that match the
+   * selector is less than expected.
+   *
+   * @Then at least :n element(s) should match :selector
+   */
+  public function matchAtLeast($selector, $n) {
+    $session = $this->getSession();
+
+    $count = count($session->getPage()->findAll('css', $selector));
+
+    if ($count < $n) {
+      throw new ExpectationException("Expected '$selector' to match at least $n elements, but it matched $count.", $session->getDriver());
+    }
+  }
+
 }
