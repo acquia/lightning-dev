@@ -4,6 +4,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
 /**
@@ -327,6 +328,39 @@ class ElementContext extends DrupalSubContextBase {
       "Expected '$summary' details to be closed, but it is open.",
       $this->getSession()->getDriver()
     );
+  }
+
+  /**
+   * Clicks an arbitrary element, found by CSS selector.
+   *
+   * @param string $selector
+   *   The CSS selector.
+   *
+   * @When I click the :selector element
+   */
+  public function click($selector) {
+    $element = $this->assertSession()->elementExists('css', $selector);
+
+    try {
+      $this->scrollTo($selector);
+    }
+    catch (UnsupportedDriverActionException $e) {
+      // Don't worry about it.
+    }
+    $element->click();
+  }
+
+  /**
+   * Scrolls an element into the viewport.
+   *
+   * @param string $selector
+   *   The element's CSS selector.
+   *
+   * @When I scroll to the :selector element
+   */
+  public function scrollTo($selector) {
+    $this->getSession()
+      ->executeScript('document.querySelector("' . addslashes($selector) . '").scrollIntoView()');
   }
 
 }
