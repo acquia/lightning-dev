@@ -3,7 +3,9 @@
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup as Plural;
+use Drupal\DrupalExtension\Context\DrupalContext;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
+use Drupal\DrupalExtension\Hook\Scope\AfterNodeCreateScope;
 
 /**
  * Contains miscellaneous step definitions for working with Drupal entities.
@@ -220,6 +222,23 @@ class EntityContext extends DrupalSubContextBase {
       ->assertSession()
       ->elementExists('named', ['link', 'edit-form'])
       ->click();
+  }
+
+  /**
+   * Reacts when a node is created by Drupal Extension's step definition.
+   *
+   * @afterNodeCreate
+   */
+  public function onNodeCreate(AfterNodeCreateScope $scope) {
+    $node = $scope->getEntity();
+
+    if (! isset($node->uid)) {
+      $context = $this->getContext(DrupalContext::class);
+
+      if ($context instanceof DrupalContext && $context->user) {
+        $node->uid = $context->user->uid;
+      }
+    }
   }
 
 }
