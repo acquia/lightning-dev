@@ -131,4 +131,101 @@ class ElementContext extends DrupalSubContextBase {
     $this->getSession()->switchToWindow();
   }
 
+  /**
+   * Asserts that vertical tab set exists.
+   *
+   * @param ElementInterface $container
+   *   (optional) The element containing the vertical tab set.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The vertical tab set.
+   *
+   * @Then I should see a set of vertical tabs
+   */
+  public function assertVerticalTabs(ElementInterface $container = NULL) {
+    return $this
+      ->assertSession()
+      ->elementExists('css', 'ul.vertical-tabs__menu', $container);
+  }
+
+  /**
+   * Asserts that a specific vertical tab exists.
+   *
+   * @param string $tab
+   *   The text of the tab.
+   * @param ElementInterface $container
+   *   (optional) The element containing the vertical tab set.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The vertical tab.
+   *
+   * @Then I should see a :tab vertical tab
+   * @Then I should see the :tab vertical tab
+   */
+  public function assertVerticalTab($tab, ElementInterface $container = NULL) {
+    return $this
+      ->assertSession()
+      ->elementExists(
+        'named',
+        ['link', $tab],
+        $this->assertVerticalTabs($container)
+      );
+  }
+
+  /**
+   * Asserts that a specific vertical tab does not exist.
+   *
+   * @param string $tab
+   *   The text of the tab.
+   * @param ElementInterface $container
+   *   (optional) The element containing the vertical tab set.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The vertical tab.
+   *
+   * @Then I should not see a :tab vertical tab
+   * @Then I should not see the :tab vertical tab
+   */
+  public function assertNoVerticalTab($tab, ElementInterface $container = NULL) {
+    $this
+      ->assertSession()
+      ->elementNotExists(
+        'named',
+        ['link', $tab],
+        $this->assertVerticalTabs($container)
+      );
+  }
+
+  /**
+   * Asserts that a specific set of vertical tabs exists.
+   *
+   * @param \Behat\Gherkin\Node\PyStringNode $tabs
+   *   The text of the tabs, one per line.
+   * @param ElementInterface $container
+   *   (optional) The element containing the vertical tab set.
+   *
+   * @Then I should see (the )vertical tabs:
+   */
+  public function assertVerticalTabMultiple(PyStringNode $tabs, ElementInterface $container = NULL) {
+    foreach ($tabs->getStrings() as $tab) {
+      $this->assertVerticalTab($tab, $container);
+    }
+  }
+
+  /**
+   * Asserts that a set of specific vertical tabs exists.
+   *
+   * @param \Behat\Gherkin\Node\PyStringNode $tabs
+   *   The text of the tabs, one per line.
+   * @param ElementInterface $container
+   *   (optional) The element containing the vertical tab set.
+   *
+   * @Then I should not see (the )vertical tabs:
+   */
+  public function assertNotVerticalTabMultiple(PyStringNode $tabs, ElementInterface $container = NULL) {
+    foreach ($tabs->getStrings() as $tab) {
+      $this->assertNoVerticalTab($tab, $container);
+    }
+  }
+
 }
