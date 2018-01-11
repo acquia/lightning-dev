@@ -2,6 +2,7 @@
 
 use Drupal\lightning_core\Element;
 use Drupal\user\Entity\Role;
+use Drupal\user\UserInterface;
 use Drupal\workflows\Entity\Workflow;
 
 /**
@@ -90,5 +91,35 @@ function lightning_dev_modules_installed(array $modules) {
 function lightning_dev_module_implements_alter(array &$implementations, $hook) {
   if ($hook == 'modules_installed' && isset($implementations['wbm2cm'])) {
     Element::toTail($implementations, 'lightning_dev');
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * This is used to automatically clean up after our Behat test suite, which
+ * creates zillions of users and a lot of test data. Anything associated with
+ * a test user should definitely be deleted when their account is.
+ */
+function lightning_dev_user_delete(UserInterface $account) {
+  $module_handler = \Drupal::moduleHandler();
+
+  $delete_all = function ($entity_type) use ($account) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+    $items = $storage->getQuery()
+      ->condition($storage->getEntityType()->getKey('uid'), $account->id())
+      ->execute();
+
+    foreach ($storage->loadMultiple($items) as $entity) {
+      $entity->delete();
+    }
+  };
+
+  if ($module_handler->moduleExists('node')) {
+    $delete_all('node');
+  }
+  if ($module_handler->moduleExists('media')) {
+    $delete_all('media');
   }
 }
