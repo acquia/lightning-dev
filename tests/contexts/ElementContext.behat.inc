@@ -2,6 +2,7 @@
 
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Element\ElementInterface;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
@@ -226,6 +227,106 @@ class ElementContext extends DrupalSubContextBase {
     foreach ($tabs->getStrings() as $tab) {
       $this->assertNoVerticalTab($tab, $container);
     }
+  }
+
+  /**
+   * Asserts the existence of a <details> element by its summary text.
+   *
+   * @param string $summary
+   *   The exact summary text.
+   * @param ElementInterface $container
+   *   The element in which to search for the <details> element.
+   *
+   * @return \Behat\Mink\Element\NodeElement|bool
+   *   The <details> element, or FALSE if it was not found.
+   */
+  protected function findDetails($summary, ElementInterface $container) {
+    /** @var \Behat\Mink\Element\NodeElement $element */
+    foreach ($container->findAll('css', 'details > summary') as $element) {
+      if ($element->getText() == $summary) {
+        return $element->getParent();
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Asserts the existence of a <details> element by its summary text.
+   *
+   * @param string $summary
+   *   The exact summary text.
+   * @param ElementInterface $container
+   *   (optional) The element in which to search for the <details> element.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The <details> element.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException if the element is
+   * not found in the container.
+   *
+   * @Then I should see a(n) :summary details element
+   */
+  public function assertDetails($summary, ElementInterface $container = NULL) {
+    $session = $this->getSession();
+
+    $element = $this->findDetails($summary, $container ?: $session->getPage());
+    if ($element) {
+      return $element;
+    }
+    else {
+      throw new ElementNotFoundException($session->getDriver(), 'details', 'summary', $summary);
+    }
+  }
+
+  /**
+   * Asserts the existence of an open <details> element by its summary text.
+   *
+   * @param string $summary
+   *   The exact summary text.
+   * @param ElementInterface $container
+   *   (optional) The element in which to search for the <details> element.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException if the <details> element
+   * is closed.
+   *
+   * @Then I should see an open :summary details element
+   */
+  public function assertOpenDetails($summary, ElementInterface $container = NULL) {
+    $open = $this->assertDetails($summary, $container)->hasAttribute('open');
+
+    if (! $open) {
+      throw new ExpectationException(
+        "Expected '$summary' details to be open, but it is closed.",
+        $this->getSession()->getDriver()
+      );
+    }
+  }
+
+  /**
+   * Asserts the existence of a closed <details> element by its summary text.
+   *
+   * @param string $summary
+   *   The exact summary text.
+   * @param ElementInterface $container
+   *   (optional) The element in which to search for the <details> element.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException if the <details> element
+   * is open.
+   *
+   * @Then I should see a closed :summary details element
+   */
+  public function assertClosedDetails($summary, ElementInterface $container = NULL) {
+    try {
+      $this->assertOpenDetails($summary, $container);
+    }
+    catch (ExpectationException $e) {
+      return;
+    }
+
+    throw new ExpectationException(
+      "Expected '$summary' details to be closed, but it is open.",
+      $this->getSession()->getDriver()
+    );
   }
 
 }
