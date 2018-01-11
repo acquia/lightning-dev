@@ -108,4 +108,27 @@ class ElementContext extends DrupalSubContextBase {
     }
   }
 
+  /**
+   * Switches to a frame.
+   *
+   * @param string $name
+   *   The frame name.
+   *
+   * @When I switch to the :name frame
+   * @When I enter the :name frame
+   */
+  public function enterFrame($name) {
+    $this->getSession()->switchToIFrame($name);
+  }
+
+  /**
+   * Switches out of an frame, into the main window.
+   *
+   * @When I (switch|return) to the window
+   * @When I (exit|leave) the frame
+   */
+  public function exitFrame() {
+    $this->getSession()->switchToWindow();
+  }
+
 }
