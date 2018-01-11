@@ -1,6 +1,8 @@
 <?php
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Exception\ExpectationException;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup as Plural;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
 /**
@@ -114,6 +116,96 @@ class EntityContext extends DrupalSubContextBase {
     foreach ($items as $id) {
       $this->trash[$entity_type][] = $id;
     }
+  }
+
+  /**
+   * Counts the number of entities of a specific type and optional bundle.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param string $bundle
+   *   (optional) The bundle.
+   *
+   * @return int
+   *   How many entities exist of the given type and bundle.
+   */
+  protected function count($entity_type, $bundle = NULL) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+    $query = $storage->getQuery()->count();
+    if ($bundle) {
+      $query->condition($storage->getEntityType()->getKey('bundle'), $bundle);
+    }
+    return (int) $query->execute();
+  }
+
+  /**
+   * Asserts that entities of a specific type and optional bundle exist.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param int $n
+   *   (optional) How many entities are expected to exist.
+   * @param string $bundle
+   *   (optional) The bundle.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException if the number of
+   * existing entities does not match the expected number.
+   *
+   * @Then a(n) :entity_type entity should exist
+   * @Then a(n) :bundle :entity_type entity should exist
+   * @Then :n :entity_type entities should exist
+   * @Then :n :bundle :entity_type entities should exist
+   */
+  public function assertCount($entity_type, $n = 1, $bundle = NULL) {
+    $count = $this->count($entity_type, $bundle);
+
+    if ($count !== (int) $n) {
+      $message = sprintf(
+        'Expected %s to exist, but there are only %s.',
+        $this->formatCount($entity_type, $n),
+        $this->formatCount($entity_type, $count)
+      );
+      throw new ExpectationException($message, $this->getSession()->getDriver());
+    }
+  }
+
+  /**
+   * Asserts that no entities of a specific type and optional bundle exist.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param string $bundle
+   *   (optional) The bundle.
+   *
+   * @Then no :entity_type entities should exist
+   * @Then no :bundle :entity_type entities should exist
+   */
+  public function assertNone($entity_type, $bundle = NULL) {
+    $this->assertCount($entity_type, 0, $bundle);
+  }
+
+  /**
+   * Generates a formatted entity count string.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param int $n
+   *   The number of entities.
+   *
+   * @see ::assertCount()
+   *
+   * @return string
+   *   A formatted entity count string, e.g. '33 content items'.
+   */
+  protected function formatCount($entity_type, $n) {
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type);
+
+    return (string) new Plural(
+      (int) $n,
+      $entity_type->getSingularLabel(),
+      $entity_type->getPluralLabel()
+    );
   }
 
   /**
