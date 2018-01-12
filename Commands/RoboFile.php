@@ -31,7 +31,26 @@ class RoboFile extends Tasks
         return $this->taskExec('vendor/bin/drush')->rawArg($command);
     }
 
-    public function install ($db_url, $profile = 'lightning')
+    /**
+     * Installs Lightning and, optionally, the developer tools.
+     *
+     * @param string $db_url
+     *   The URL of the Drupal database.
+     * @param string $profile
+     *   (optional) The installation profile to use.
+     * @param string $base_url
+     *   (optional) The URL of the Drupal site.
+     * @param array $options
+     *   (optional) Additional command options.
+     *
+     * @option $no-dev Do not install developer tools or configure test runners.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
+    public function install ($db_url, $profile = 'lightning', $base_url = NULL, array $options = [
+        'no-dev' => FALSE,
+    ])
     {
         $tasks = $this->collectionBuilder()
             ->addTask(
@@ -58,12 +77,54 @@ class RoboFile extends Tasks
           array_push($install, $extension);
 
           $tasks->addTask(
-            $this->taskDrush('pm-enable')->args($install)->option('yes')
+              $this->taskDrush('pm-enable')->args($install)->option('yes')
           );
         }
+
+        if ($options['no-dev'] == FALSE)
+        {
+            $tasks->addTask(
+                $this->installDev($db_url, $base_url)
+            );
+        }
+
         return $tasks;
     }
 
+    /**
+     * Installs developer tools and configures test runners.
+     *
+     * @param string $db_url
+     *   The URL of the Drupal database.
+     * @param string $base_url
+     *   (optional) The URL of the Drupal site.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
+    public function installDev ($db_url, $base_url = NULL)
+    {
+        return $this->collectionBuilder()
+            ->addTask(
+                $this->taskDrush('pm-enable')->arg('lightning_dev')->option('yes')
+            )
+            ->addTask(
+                $this->configurePhpUnit($db_url, $base_url)
+            )
+            ->addTask(
+                $this->configureBehat($base_url)
+            );
+    }
+
+    /**
+     * Prepares settings.php for use with Acquia Cloud.
+     *
+     * @param string $subscription
+     *   (optional) The Cloud subscription ID.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
     public function configureCloud ($subscription = 'lightningnightly')
     {
         $settings = 'docroot/sites/default/settings.php';
@@ -87,6 +148,15 @@ class RoboFile extends Tasks
             );
     }
 
+    /**
+     * Configures Behat.
+     *
+     * @param string $base_url
+     *  (optional) The URL of the Drupal site.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
     public function configureBehat ($base_url = NULL)
     {
         $configuration = [];
@@ -127,6 +197,16 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Configures PHPUnit.
+     *
+     * @param string $db_url
+     *   The URL of the Drupal database.
+     * @param string $base_url
+     *   (optional) The URL of the Drupal site.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     *
      * @command configure:phpunit
      */
     public function configurePhpUnit ($db_url, $base_url = NULL)
