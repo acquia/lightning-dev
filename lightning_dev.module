@@ -108,7 +108,7 @@ function lightning_dev_user_delete(UserInterface $account) {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     $items = $storage->getQuery()
-      ->condition($storage->getEntityType()->getKey('uid'), $account->id())
+      ->condition('uid', $account->id())
       ->execute();
 
     foreach ($storage->loadMultiple($items) as $entity) {

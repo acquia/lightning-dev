@@ -2,8 +2,8 @@
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
+use Drupal\user\EntityOwnerInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup as Plural;
-use Drupal\DrupalExtension\Context\DrupalContext;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 use Drupal\DrupalExtension\Hook\Scope\BeforeNodeCreateScope;
 
@@ -31,11 +31,23 @@ class EntityContext extends DrupalSubContextBase {
    * @Given :entity_type entities:
    */
   public function createMultiple($entity_type, TableNode $table) {
+    try {
+      $uid = $this->getUser()->uid;
+    }
+    catch (\Exception $e) {
+      // No worries.
+    }
+
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     foreach ($table as $values) {
       $entity = $storage->create($values);
+
+      if ($entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0 && isset($uid)) {
+        $entity->setOwnerId($uid);
+      }
       $entity->save();
+
       $this->trash[$entity_type][] = $entity->id();
     }
   }
@@ -210,16 +222,17 @@ class EntityContext extends DrupalSubContextBase {
   /**
    * Reacts when a node is created by Drupal Extension's step definition.
    *
-   * @beforeNodeCreate
+   * @BeforeNodeCreate
    */
   public function onNodeCreate(BeforeNodeCreateScope $scope) {
     $node = $scope->getEntity();
 
     if (! isset($node->uid)) {
-      $context = $this->getContext(DrupalContext::class);
-
-      if ($context instanceof DrupalContext && $context->user) {
-        $node->uid = $context->user->uid;
+      try {
+        $node->uid = $this->getUser()->uid;
+      }
+      catch (\Exception $e) {
+        // Okay then...
       }
     }
   }
