@@ -172,8 +172,10 @@ class EntityContext extends DrupalSubContextBase {
    * @throws \Behat\Mink\Exception\ExpectationException if the number of
    * existing entities does not match the expected number.
    *
-   * @Then :n :entity_type entit(y|ies) should exist
-   * @Then :n :bundle :entity_type entit(y|ies) should exist
+   * @Then 1 :entity_type entity should exist
+   * @Then 1 :bundle :entity_type entity should exist
+   * @Then :n :entity_type entities should exist
+   * @Then :n :bundle :entity_type entities should exist
    */
   public function assertCount($entity_type, $n = 1, $bundle = NULL) {
     $count = $this->count($entity_type, $bundle);
