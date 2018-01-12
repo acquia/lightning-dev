@@ -9,6 +9,14 @@ use Symfony\Component\Yaml\Yaml;
 
 class RoboFile extends Tasks
 {
+
+    /**
+     * The default URL of the Drupal site.
+     *
+     * @var string
+     */
+    const BASE_URL = 'http://127.0.0.1';
+
     /**
      * Builds a task to execute a Drush command.
      *
@@ -79,7 +87,7 @@ class RoboFile extends Tasks
             );
     }
 
-    public function configureBehat ($base_url = 'http://127.0.0.1')
+    public function configureBehat ($base_url = NULL)
     {
         $configuration = [];
 
@@ -108,7 +116,7 @@ class RoboFile extends Tasks
                     '%drupal_root%',
                 ],
                 [
-                    $base_url,
+                    $base_url ?: static::BASE_URL,
                     'docroot',
                 ],
                 Yaml::dump($configuration)
@@ -116,5 +124,35 @@ class RoboFile extends Tasks
 
             return $this->taskWriteToFile('.behat.yml')->text($configuration);
         }
+    }
+
+    /**
+     * @command configure:phpunit
+     */
+    public function configurePhpUnit ($db_url, $base_url = NULL)
+    {
+        $conf = 'docroot/core/phpunit.xml';
+
+        return $this->collectionBuilder()
+            ->addTask(
+                $this->taskFilesystemStack()
+                    ->copy("$conf.dist", $conf, TRUE)
+                    ->mkdir([
+                        'docroot/modules',
+                        'docroot/profiles',
+                        'docroot/themes',
+                    ])
+            )
+            ->addTask(
+                $this->taskReplaceInFile($conf)
+                    ->from([
+                        '<env name="SIMPLETEST_DB" value=""/>',
+                        '<env name="SIMPLETEST_BASE_URL" value=""/>',
+                    ])
+                    ->to([
+                        '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
+                        '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
+                    ])
+            );
     }
 }
