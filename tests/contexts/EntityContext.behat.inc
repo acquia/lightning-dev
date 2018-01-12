@@ -2,10 +2,11 @@
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
-use Drupal\user\EntityOwnerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup as Plural;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 use Drupal\DrupalExtension\Hook\Scope\BeforeNodeCreateScope;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Contains miscellaneous step definitions for working with Drupal entities.
@@ -21,6 +22,25 @@ class EntityContext extends DrupalSubContextBase {
   protected $trash = [];
 
   /**
+   * Saves an entity, ensuring automatic clean-up.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to save.
+   */
+  public function save(EntityInterface $entity) {
+    $uid = $this->getUser();
+
+    if ($uid && $entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0) {
+      $entity->setOwnerId($uid)->save();
+    }
+    else {
+      $entity->save();
+      $entity_type = $entity->getEntityTypeId();
+      $this->trash[$entity_type][] = $entity->id();
+    }
+  }
+
+  /**
    * Creates a set of entities from tabular data.
    *
    * @param string $entity_type
@@ -31,18 +51,10 @@ class EntityContext extends DrupalSubContextBase {
    * @Given :entity_type entities:
    */
   public function createMultiple($entity_type, TableNode $table) {
-    $uid = $this->getUser();
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     foreach ($table as $values) {
-      $entity = $storage->create($values);
-
-      if ($entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0 && $uid) {
-        $entity->setOwnerId($uid);
-      }
-      $entity->save();
-
-      $this->trash[$entity_type][] = $entity->id();
+      $this->save($storage->create($values));
     }
   }
 
