@@ -1,6 +1,8 @@
 <?php
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\lightning_core\Element;
+use Drupal\user\EntityOwnerInterface;
 use Drupal\user\Entity\Role;
 use Drupal\user\UserInterface;
 use Drupal\workflows\Entity\Workflow;
@@ -91,6 +93,17 @@ function lightning_dev_modules_installed(array $modules) {
 function lightning_dev_module_implements_alter(array &$implementations, $hook) {
   if ($hook == 'modules_installed' && isset($implementations['wbm2cm'])) {
     Element::toTail($implementations, 'lightning_dev');
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function lightning_dev_entity_presave(EntityInterface $entity) {
+  $user = \Drupal::currentUser();
+
+  if ($user->isAuthenticated() && $entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0) {
+    $entity->setOwnerId($user->id());
   }
 }
 

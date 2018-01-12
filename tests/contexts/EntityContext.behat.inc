@@ -31,19 +31,13 @@ class EntityContext extends DrupalSubContextBase {
    * @Given :entity_type entities:
    */
   public function createMultiple($entity_type, TableNode $table) {
-    try {
-      $uid = $this->getUser()->uid;
-    }
-    catch (\Exception $e) {
-      // No worries.
-    }
-
+    $uid = $this->getUser();
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     foreach ($table as $values) {
       $entity = $storage->create($values);
 
-      if ($entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0 && isset($uid)) {
+      if ($entity instanceof EntityOwnerInterface && $entity->getOwnerId() == 0 && $uid) {
         $entity->setOwnerId($uid);
       }
       $entity->save();
@@ -228,12 +222,19 @@ class EntityContext extends DrupalSubContextBase {
     $node = $scope->getEntity();
 
     if (! isset($node->uid)) {
-      try {
-        $node->uid = $this->getUser()->uid;
-      }
-      catch (\Exception $e) {
-        // Okay then...
-      }
+      $node->uid = $this->getUser();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getUser() {
+    try {
+      return parent::getUser()->uid;
+    }
+    catch (\Exception $e) {
+      return 0;
     }
   }
 
