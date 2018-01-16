@@ -95,6 +95,21 @@ class ElementContext extends DrupalSubContextBase {
   }
 
   /**
+   * Asserts that a select list does not have a particular option.
+   *
+   * @param string $select
+   *   The select list to check.
+   * @param string $option
+   *   The option to look for.
+   *
+   * @Then the :select field should not have a(n) :option option
+   */
+  public function assertNoOption($select, $option) {
+    $this->assertSession()
+      ->elementNotExists('named', ['option', $option], $this->assertField($select));
+  }
+
+  /**
    * Asserts that a select list has a set of options.
    *
    * @param string $select
@@ -107,6 +122,22 @@ class ElementContext extends DrupalSubContextBase {
   public function assertOptions($select, PyStringNode $options) {
     foreach ($options->getStrings() as $option) {
       $this->assertOption($select, $option);
+    }
+  }
+
+  /**
+   * Asserts that a select list does not have a set of options.
+   *
+   * @param string $select
+   *   The select list to check.
+   * @param \Behat\Gherkin\Node\PyStringNode $options
+   *   The options to look for.
+   *
+   * @Then the :select field should not have options:
+   */
+  public function assertOptions($select, PyStringNode $options) {
+    foreach ($options->getStrings() as $option) {
+      $this->assertNoOption($select, $option);
     }
   }
 
