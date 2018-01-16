@@ -135,7 +135,7 @@ class ElementContext extends DrupalSubContextBase {
    *
    * @Then the :select field should not have options:
    */
-  public function assertOptions($select, PyStringNode $options) {
+  public function assertNoOptions($select, PyStringNode $options) {
     foreach ($options->getStrings() as $option) {
       $this->assertNoOption($select, $option);
     }
