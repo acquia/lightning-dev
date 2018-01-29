@@ -417,4 +417,30 @@ class ElementContext extends DrupalSubContextBase {
     }
   }
 
+  /**
+   * Asserts that a block with a specific plugin ID is present.
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   *
+   * @Then I should see a :plugin_id block
+   */
+  public function assertBlockExists($plugin_id) {
+    $this->assertSession()
+      ->elementExists('css', "[data-block-plugin-id='$plugin_id']");
+  }
+
+  /**
+   * Asserts that a block with a specific plugin ID is not present.
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   *
+   * @Then I should not see a :plugin_id block
+   */
+  public function assertBlockNotExists($plugin_id) {
+    $this->assertSession()
+      ->elementNotExists('css', "[data-block-plugin-id='$plugin_id']");
+  }
+
 }
