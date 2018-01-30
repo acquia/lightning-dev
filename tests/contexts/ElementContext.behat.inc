@@ -66,6 +66,23 @@ class ElementContext extends DrupalSubContextBase {
   }
 
   /**
+   * Asserts that a field element exists and is disabled.
+   *
+   * @param string $field
+   *   The field locator.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The disabled form field element.
+   *
+   * @Then I should see a disabled :field field
+   * @Then the :field field should be disabled
+   */
+  public function assertDisabledField($field) {
+    return $this->assertSession()
+      ->elementAttributeExists('named', ['field', $field], 'disabled');
+  }
+
+  /**
    * Asserts that a form field is not present.
    *
    * Oddly, MinkContext does not appear to provide a step definition for this.
