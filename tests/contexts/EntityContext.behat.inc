@@ -252,4 +252,45 @@ class EntityContext extends DrupalSubContextBase {
     }
   }
 
+  /**
+   * Visits a specific revision of a node.
+   *
+   * @param int $n
+   *   The one-based index of the revision.
+   *
+   * @When /^I visit the (\d+)(?:st|nd|rd|th) revision$/
+   */
+  public function visitRevision($n) {
+    $this->assertSession()
+      ->elementExists('named', ['link', 'Revisions'])
+      ->click();
+
+    $this->getContext('ElementContext')
+      ->click("main table tr:nth-child($n) td:first-child a");
+  }
+
+  /**
+   * Visits the current revision of a node.
+   *
+   * @When I visit the current revision
+   */
+  public function visitCurrentRevision() {
+    $this->assertSession()
+      ->elementExists('named', ['link', 'Revisions'])
+      ->click();
+
+    $session = $this->getSession();
+
+    $rows = $session->getPage()->findAll('css', '.node-revisions-table tbody tr');
+    /** @var \Behat\Mink\Element\NodeElement $row */
+    foreach ($rows as $row) {
+      if ($row->find('css', 'td:last-child')->getText() == 'Current revision') {
+        return $row->find('css', 'td:first-child a')->click();
+      }
+    }
+
+    // WTF? None of the rows were the current revision.
+    throw new ExpectationException('Current revision not found.', $session->getDriver());
+  }
+
 }
