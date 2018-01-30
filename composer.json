@@ -21,15 +21,14 @@
         "drupal/coder": "~8.2.0",
         "drupal/devel": "^1.0",
         "drush/drush": "^9",
-        "consolidation/robo": "^1.2"
+        "consolidation/robo": "^1.2",
+        "drupal/lightning_core": "^1.0"
     },
     "require-dev": {
-        "drupal/core": "~8.4.3",
         "cweagans/composer-patches": "^1.6.4",
         "drupal-composer/drupal-scaffold": "^2.0.0",
         "oomphinc/composer-installers-extender": "^1.1",
-        "composer/composer": "^1.5",
-        "drupal/lightning_core": "^1.0"
+        "composer/composer": "^1.5"
     },
     "repositories": {
         "drupal": {
