@@ -434,4 +434,88 @@ class ElementContext extends DrupalSubContextBase {
     }
   }
 
+  /**
+   * Asserts that a block with a specific plugin ID is present.
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   *
+   * @return ElementInterface
+   *   The block element.
+   *
+   * @Then I should see a :plugin_id block
+   */
+  public function assertBlockExists($plugin_id) {
+    return $this->assertSession()
+      ->elementExists('css', "[data-block-plugin-id='$plugin_id']");
+  }
+
+  /**
+   * Asserts that a block with a specific plugin ID is not present.
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   *
+   * @Then I should not see a :plugin_id block
+   */
+  public function assertBlockNotExists($plugin_id) {
+    $this->assertSession()
+      ->elementNotExists('css', "[data-block-plugin-id='$plugin_id']");
+  }
+
+  /**
+   * Asserts that an element has contextual links.
+   *
+   * @param \Behat\Mink\Element\ElementInterface $element
+   *   The element which is expected to contain contextual links.
+   *
+   * @return ElementInterface
+   *   The list of contextual links.
+   */
+  protected function assertContextualLinks(ElementInterface $element) {
+    return $this->assertSession()
+      ->elementExists('css', 'ul.contextual-links', $element);
+  }
+
+  /**
+   * Asserts that an element has a specific contextual link.
+   *
+   * @param \Behat\Mink\Element\ElementInterface $element
+   *   The element which is expectd to contain the contextual link.
+   * @param (string) $link_class
+   *   The CSS class of the contextual link.
+   *
+   * @return ElementInterface
+   *   The contextual link.
+   */
+  protected function assertContextualLink(ElementInterface $element, $link_class) {
+    return $this->assertSession()
+      ->elementExists('css', "li.$link_class", $this->assertContextualLinks($element));
+  }
+
+  /**
+   * Asserts that a block has contextual link(s).
+   *
+   * @param string $plugin_id
+   *   The block plugin ID.
+   * @param string $link_class
+   *   (optional) The CSS class of a specific contextual link.
+   *
+   * @see ::assertContextualLinks()
+   * @see ::assertContextualLink()
+   * @see ::assertBlockExists()
+   *
+   * @Then the :plugin_id block should have contextual links
+   * @Then the :plugin_id block should have a :link_class contextual link
+   * @Then I should see a :plugin_id block with contextual links
+   * @Then I should see a :plugin_id block with a :link_class contextual link
+   */
+  public function assertBlockHasContextual($plugin_id, $link_class = NULL) {
+    $element = $this->assertBlockExists($plugin_id);
+
+    return $link_class
+      ? $this->assertContextualLink($element, $link_class)
+      : $this->assertContextualLinks($element);
+  }
+
 }
