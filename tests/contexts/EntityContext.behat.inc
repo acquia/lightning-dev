@@ -281,7 +281,9 @@ class EntityContext extends DrupalSubContextBase {
 
     $session = $this->getSession();
 
-    $rows = $session->getPage()->findAll('css', '.node-revision-table tbody tr');
+    // The revision table's selector may vary depending on whether or not Diff
+    // is installed, so we need to use a pretty general selector.
+    $rows = $session->getPage()->findAll('css', 'main table > tbody tr');
     /** @var \Behat\Mink\Element\NodeElement $row */
     foreach ($rows as $row) {
       if ($row->find('css', 'td:last-child')->getText() == 'Current revision') {
