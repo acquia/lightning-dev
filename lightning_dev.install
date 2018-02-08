@@ -216,3 +216,14 @@ function lightning_dev_update_8009() {
     $config->set($key, $display)->save();
   }
 }
+
+/**
+ * Causes all modules to react to the presence of Lightning Dev.
+ */
+function lightning_dev_update_8010() {
+  $module_handler = \Drupal::moduleHandler();
+  $module_handler->resetImplementations();
+  $module_handler->invokeAll('modules_installed', [
+    ['lightning_dev'],
+  ]);
+}
