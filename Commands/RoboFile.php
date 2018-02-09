@@ -121,11 +121,14 @@ class RoboFile extends Tasks
      *
      * @param string $subscription
      *   (optional) The Cloud subscription ID.
+     * @param string $install_profile
+     *   (optional) The machine name of the install profile to write to
+     *   settings.php.
      *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      */
-    public function configureCloud ($subscription = 'lightningnightly')
+    public function configureCloud ($subscription = 'lightningnightly', $install_profile = 'lightning')
     {
         $settings = 'docroot/sites/default/settings.php';
         $site_dir = dirname($settings);
@@ -149,7 +152,7 @@ class RoboFile extends Tasks
                         "if (file_exists('/var/www/site-php')) {",
                         "  require '/var/www/site-php/$subscription/$subscription-settings.inc';",
                         "}",
-                        '$settings["install_profile"] = "lightning";',
+                        "\$settings['install_profile'] = '$install_profile';",
                     ])
             );
     }
