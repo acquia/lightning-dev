@@ -22,7 +22,7 @@
         "drupal/devel": "^1.0",
         "drush/drush": "^9",
         "consolidation/robo": "^1.2",
-        "drupal/lightning_core": "^1.0"
+        "drupal/lightning_core": "^1.0 || ^2.0"
     },
     "require-dev": {
         "cweagans/composer-patches": "^1.6.4",
