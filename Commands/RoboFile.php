@@ -130,6 +130,11 @@ class RoboFile extends Tasks
         $settings = 'docroot/sites/default/settings.php';
         $site_dir = dirname($settings);
 
+        // settings.php and the site directory may have received restrictive
+        // permissions during installation. We need to loosen those up in order
+        // to overwrite settings.php.
+        $this->_chmod([$settings, $site_dir], 0755);
+
         return $this->collectionBuilder()
             ->addTask(
                 $this->taskFilesystemStack()
