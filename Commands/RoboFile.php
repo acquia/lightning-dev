@@ -149,6 +149,7 @@ class RoboFile extends Tasks
                         "if (file_exists('/var/www/site-php')) {",
                         "  require '/var/www/site-php/$subscription/$subscription-settings.inc';",
                         "}",
+                        '$install_profile = "lightning";',
                     ])
             );
     }
