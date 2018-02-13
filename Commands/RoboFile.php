@@ -2,6 +2,7 @@
 
 namespace Acquia\Lightning\Commands;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Robo\Tasks;
 use Symfony\Component\Finder\Finder;
@@ -114,6 +115,39 @@ class RoboFile extends Tasks
             ->addTask(
                 $this->configureBehat($base_url)
             );
+    }
+
+    /**
+     * Reinstalls Drupal.
+     *
+     * @param string $base_url
+     *   (optional) The URL of the Drupal site.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
+    public function reinstall ($base_url = NULL)
+    {
+        $info = $this->taskDrush('core:status')
+            ->option('format', 'json')
+            ->option('fields', 'db-driver,db-username,db-password,db-hostname,db-port,db-name,install-profile')
+            ->printOutput(FALSE)
+            ->run()
+            ->getMessage();
+
+        $info = Json::decode($info);
+
+        $db_url = sprintf(
+          '%s://%s%s@%s%s/%s',
+          $info['db-driver'],
+          $info['db-username'],
+          $info['db-password'] ? ':' . $info['db-password'] : NULL,
+          $info['db-hostname'],
+          $info['db-port'] ? ':' . $info['db-port'] : NULL,
+          $info['db-name']
+        );
+
+        return $this->install($db_url, $info['install-profile'], $base_url);
     }
 
     /**
