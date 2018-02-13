@@ -173,6 +173,45 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Restores a database fixture.
+     *
+     * @param string $version
+     *   The fixture version to restore. Must exist in the tests/fixtures
+     *   directory as $version.sql.gz.
+     *
+     * @return \Robo\Contract\TaskInterface|NULL
+     *   The task to execute, or NULL if the fixture does not exist.
+     */
+    public function restore ($version)
+    {
+        $fixture = "tests/fixtures/$version.sql";
+
+        if (file_exists($fixture))
+        {
+            return $this->collectionBuilder()
+                ->addTask(
+                    $this->taskDrush('sql:drop')->option('yes')
+                )
+                ->addTask(
+                    $this->taskExec('gunzip')
+                        ->arg("$fixture.gz")
+                        ->option('keep')
+                        ->option('force')
+                )
+                ->addTask(
+                    $this->taskDrush('sql:query')->option('file', "../$fixture")
+                )
+                ->completion(
+                    $this->taskFilesystemStack()->remove($fixture)
+                );
+        }
+        else
+        {
+            $this->say("$version fixture does not exist.");
+        }
+    }
+
+    /**
      * Prepares settings.php for use with Acquia Cloud.
      *
      * @param string $subscription
