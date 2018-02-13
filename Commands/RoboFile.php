@@ -184,7 +184,7 @@ class RoboFile extends Tasks
      */
     public function restore ($version)
     {
-        $fixture = "tests/fixtures/$version.sql";
+        $fixture = "tests/fixtures/$version.sql.gz";
 
         if (file_exists($fixture))
         {
@@ -194,12 +194,12 @@ class RoboFile extends Tasks
                 )
                 ->addTask(
                     $this->taskExec('gunzip')
-                        ->arg("$fixture.gz")
+                        ->arg($fixture)
                         ->option('keep')
                         ->option('force')
                 )
                 ->addTask(
-                    $this->taskDrush('sql:query')->option('file', "../$fixture")
+                    $this->taskDrush('sql:query')->option('file', basename("../$fixture", '.gz'))
                 )
                 ->completion(
                     $this->taskFilesystemStack()->remove($fixture)
