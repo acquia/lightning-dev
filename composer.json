@@ -44,7 +44,6 @@
       "classmap": ["Commands/", "tests/contexts/AwaitTrait.inc"]
     },
     "bin": [
-      "install-chromedriver",
       "lightning"
     ],
     "scripts": {
