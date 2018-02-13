@@ -151,6 +151,28 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Generates a compressed database fixture.
+     *
+     * @param string $version
+     *   The version the fixture represents.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
+    public function makeFixture ($version)
+    {
+        return $this->collectionBuilder()
+            ->addTask(
+                $this->reinstall()
+            )
+            ->addTask(
+                $this->taskDrush('sql:dump')
+                    ->option('gzip')
+                    ->option('result-file', "../tests/fixtures/$version.sql")
+            );
+    }
+
+    /**
      * Prepares settings.php for use with Acquia Cloud.
      *
      * @param string $subscription
