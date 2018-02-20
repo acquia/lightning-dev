@@ -212,6 +212,33 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Restores a database fixture and runs all available updates.
+     *
+     * @param string $from_version
+     *   The fixture version to restore. Must exist in the tests/fixtures
+     *   directory as $version.sql.gz.
+     *
+     * @return \Robo\Contract\TaskInterface|NULL
+     *   The task to execute, or NULL if the fixture does not exist.
+     */
+    public function update ($from_version)
+    {
+        /** @var \Robo\Collection\CollectionBuilder $tasks */
+        $tasks = $this->restore($from_version);
+
+        if ($tasks)
+        {
+            return $tasks
+                ->addTask(
+                    $this->taskDrush('updatedb')->option('yes')
+                )
+                ->addTask(
+                    $this->taskDrush('update:lightning')
+                );
+        }
+    }
+
+    /**
      * Prepares settings.php for use with Acquia Cloud.
      *
      * @param string $subscription
