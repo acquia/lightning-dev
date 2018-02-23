@@ -233,7 +233,7 @@ class RoboFile extends Tasks
                     $this->taskDrush('updatedb')->option('yes')
                 )
                 ->addTask(
-                    $this->taskDrush('update:lightning')
+                    $this->taskDrush('update:lightning')->option('no-interaction')
                 );
         }
     }
