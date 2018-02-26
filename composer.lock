@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd15e0f180cf049c086f295e505bd936",
+    "content-hash": "b0a281e715ff0b4c76a39dc135e05cbc",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1957,62 +1957,6 @@
                 "web"
             ],
             "time": "2017-09-13T19:54:23+00:00"
-        },
-        {
-            "name": "drupal/lightning_core",
-            "version": "1.0.0-alpha1",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupal.org/project/lightning_core",
-                "reference": "8.x-1.0-alpha1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/lightning_core-8.x-1.0-alpha1.zip",
-                "reference": "8.x-1.0-alpha1",
-                "shasum": "d6617b9639907f7642cddcd4af360eb91b695c01"
-            },
-            "require": {
-                "drupal/core": "*"
-            },
-            "require-dev": {
-                "drupal/contact_storage": "*",
-                "drupal/devel_generate": "*",
-                "drupal/search_api": "*"
-            },
-            "type": "drupal-module",
-            "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
-                "drupal": {
-                    "version": "8.x-1.0-alpha1",
-                    "datestamp": "1514321584",
-                    "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Project has not opted into security advisory coverage!"
-                    }
-                }
-            },
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "balsama",
-                    "homepage": "https://www.drupal.org/user/223087"
-                },
-                {
-                    "name": "phenaproxima",
-                    "homepage": "https://www.drupal.org/user/205645"
-                }
-            ],
-            "description": "Shared functionality for the Lightning distribution.",
-            "homepage": "https://www.drupal.org/project/lightning_core",
-            "support": {
-                "source": "http://cgit.drupalcode.org/lightning_core"
-            }
         },
         {
             "name": "drush/drush",
