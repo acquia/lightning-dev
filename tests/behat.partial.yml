@@ -26,9 +26,6 @@ default:
         drupal_root: '%drupal_root%'
       drush:
         alias: self
-      subcontexts:
-        paths:
-          - '%paths.base%/contexts'
       selectors:
         error_message_selector: '.messages [role="alert"]'
         warning_message_selector: '.messages--warning'
