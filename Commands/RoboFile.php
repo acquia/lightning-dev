@@ -108,7 +108,7 @@ class RoboFile extends Tasks
                 )
                 ->addTask(
                     $this->taskReplaceInFile($settings)
-                        ->from("\$settings['install_profile'] = 'profile';")
+                        ->from("\$settings['install_profile'] = '$profile';")
                         ->to(NULL)
                 )
                 ->addTask(
