@@ -23,12 +23,6 @@ function lightning_dev_install() {
     ->set('error_level', ERROR_REPORTING_DISPLAY_ALL)
     ->save();
 
-  // Sentence-case the label of the media browser's embed code widget. Yes, not
-  // doing this can cause tests to fail.
-  $config_factory->getEditable('entity_browser.browser.media_browser')
-    ->set('widgets.8b142f33-59d1-47b1-9e3a-4ae85d8376fa.label', 'Create embed')
-    ->save();
-
   // Expose the moderation_history view in the UI.
   lightning_dev_update_8009();
 
