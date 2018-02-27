@@ -53,6 +53,8 @@ class RoboFile extends Tasks
         'no-dev' => FALSE,
     ])
     {
+        $site_dir = 'docroot/sites/default';
+
         $tasks = $this->collectionBuilder()
             ->addTask(
                 $this->taskDrush('site-install')
@@ -60,6 +62,13 @@ class RoboFile extends Tasks
                     ->option('yes')
                     ->option('account-pass', 'admin')
                     ->option('db-url', stripslashes($db_url))
+            )
+            ->completion(
+                $this->taskFilesystemStack()
+                    ->chmod([
+                        $site_dir,
+                        "$site_dir/settings.php",
+                    ], 0755)
             );
 
         /** @var Finder $finder */
