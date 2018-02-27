@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0a281e715ff0b4c76a39dc135e05cbc",
+    "content-hash": "746859b152c17dfc5796fcfd525ef53a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1520,6 +1520,56 @@
                 "standards"
             ],
             "time": "2017-03-18T10:28:49+00:00"
+        },
+        {
+            "name": "drupal/config_installer",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/config_installer",
+                "reference": "8.x-1.5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/config_installer-8.x-1.5.zip",
+                "reference": "8.x-1.5",
+                "shasum": "ef2ea56469481c482c1ee716438a24b4ad12c6e2"
+            },
+            "require": {
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-profile",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.5",
+                    "datestamp": "1506257944",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                },
+                "patches_applied": {
+                    "2916090 - Support Drush 9": "https://www.drupal.org/files/issues/drush9-support-2916090-6.patch",
+                    "2935426 - Drush 9: Call to undefined function drush_generate_password": "https://www.drupal.org/files/issues/config_installer-drush_9_call_undefined_function_drush_generate_password-2935426-2.patch"
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "alexpott",
+                    "homepage": "https://www.drupal.org/user/157725"
+                }
+            ],
+            "homepage": "https://www.drupal.org/project/config_installer",
+            "support": {
+                "source": "http://cgit.drupalcode.org/config_installer"
+            }
         },
         {
             "name": "drupal/core",

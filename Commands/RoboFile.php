@@ -45,15 +45,17 @@ class RoboFile extends Tasks
      *   (optional) Additional command options.
      *
      * @option $no-dev Do not install developer tools or configure test runners.
+     * @option $from-config Reinstall from exported config.
      *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      */
     public function install ($db_url, $profile = 'lightning', $base_url = NULL, array $options = [
         'no-dev' => FALSE,
+        'from-config' => FALSE,
     ])
     {
-        $site_dir = 'docroot/sites/default';
+        $settings = 'docroot/sites/default/settings.php';
 
         $tasks = $this->collectionBuilder()
             ->addTask(
@@ -63,11 +65,11 @@ class RoboFile extends Tasks
                     ->option('account-pass', 'admin')
                     ->option('db-url', stripslashes($db_url))
             )
-            ->completion(
+            ->addTask(
                 $this->taskFilesystemStack()
                     ->chmod([
-                        $site_dir,
-                        "$site_dir/settings.php",
+                        dirname($settings),
+                        $settings,
                     ], 0755)
             );
 
@@ -96,6 +98,24 @@ class RoboFile extends Tasks
             $tasks->addTask(
                 $this->installDev($db_url, $base_url)
             );
+        }
+
+        if ($options['from-config'])
+        {
+            $tasks
+                ->addTask(
+                    $this->taskDrush('config:export')->option('yes')
+                )
+                ->addTask(
+                    $this->taskReplaceInFile($settings)
+                        ->from("\$settings['install_profile'] = 'profile';")
+                        ->to(NULL)
+                )
+                ->addTask(
+                    $this->taskDrush('site:install')
+                        ->arg('config_installer')
+                        ->option('yes')
+                );
         }
 
         return $tasks;

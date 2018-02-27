@@ -21,7 +21,8 @@
         "drupal/coder": "~8.2.0",
         "drupal/devel": "^1.0",
         "drush/drush": "^9",
-        "consolidation/robo": "^1.2"
+        "consolidation/robo": "^1.2",
+        "drupal/config_installer": "^1.5"
     },
     "require-dev": {
         "cweagans/composer-patches": "^1.6.4",
@@ -40,45 +41,53 @@
         }
     },
     "autoload": {
-      "classmap": ["Commands/"]
+        "classmap": [
+            "Commands/"
+        ]
     },
     "bin": [
-      "lightning"
+        "lightning"
     ],
     "scripts": {
-      "post-install-cmd": [
-        "@composer push",
-        "@composer drupal-scaffold",
-        "PhantomInstaller\\Installer::installPhantomJS"
-      ],
-      "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
-      "nuke": "rm -r -f docroot vendor",
-      "pull": "Acquia\\Lightning\\Commands\\FileCommands::pull",
-      "push": "Acquia\\Lightning\\Commands\\FileCommands::push"
+        "post-install-cmd": [
+            "@composer push",
+            "@composer drupal-scaffold",
+            "PhantomInstaller\\Installer::installPhantomJS"
+        ],
+        "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+        "nuke": "rm -r -f docroot vendor",
+        "pull": "Acquia\\Lightning\\Commands\\FileCommands::pull",
+        "push": "Acquia\\Lightning\\Commands\\FileCommands::push"
     },
     "extra": {
-      "installer-types": [
-        "bower-asset",
-        "npm-asset"
-      ],
-      "installer-paths": {
-        "docroot/core": [
-          "type:drupal-core"
+        "installer-types": [
+            "bower-asset",
+            "npm-asset"
         ],
-        "docroot/libraries/{$name}": [
-          "type:drupal-library",
-          "type:bower-asset",
-          "type:npm-asset"
-        ],
-        "docroot/modules/contrib/{$name}": [
-          "type:drupal-module"
-        ],
-        "docroot/profiles/contrib/{$name}": [
-          "type:drupal-profile"
-        ],
-        "docroot/themes/contrib/{$name}": [
-          "type:drupal-theme"
-        ]
-      }
+        "installer-paths": {
+            "docroot/core": [
+                "type:drupal-core"
+            ],
+            "docroot/libraries/{$name}": [
+                "type:drupal-library",
+                "type:bower-asset",
+                "type:npm-asset"
+            ],
+            "docroot/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "docroot/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "docroot/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ]
+        },
+        "patches": {
+            "drupal/config_installer": {
+                "2916090 - Support Drush 9": "https://www.drupal.org/files/issues/drush9-support-2916090-6.patch",
+                "2935426 - Drush 9: Call to undefined function drush_generate_password": "https://www.drupal.org/files/issues/config_installer-drush_9_call_undefined_function_drush_generate_password-2935426-2.patch"
+            }
+        }
     }
 }
