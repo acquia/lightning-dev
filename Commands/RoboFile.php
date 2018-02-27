@@ -115,6 +115,7 @@ class RoboFile extends Tasks
                     $this->taskDrush('site:install')
                         ->arg('config_installer')
                         ->option('yes')
+                        ->option('account-pass', 'admin')
                 );
         }
 
