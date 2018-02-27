@@ -29,11 +29,6 @@ function lightning_dev_install() {
     ->set('widgets.8b142f33-59d1-47b1-9e3a-4ae85d8376fa.label', 'Create embed')
     ->save();
 
-  $config_factory->getEditable('lightning_api.settings')
-    ->set('entity_json', TRUE)
-    ->set('bundle_docs', TRUE)
-    ->save();
-
   // Expose the moderation_history view in the UI.
   lightning_dev_update_8009();
 
