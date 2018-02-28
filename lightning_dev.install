@@ -200,6 +200,8 @@ function lightning_dev_update_8009() {
  * Causes all modules to react to the presence of Lightning Dev.
  */
 function lightning_dev_update_8010() {
+  \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
+
   $module_handler = \Drupal::moduleHandler();
   $module_handler->resetImplementations();
   $module_handler->invokeAll('modules_installed', [
