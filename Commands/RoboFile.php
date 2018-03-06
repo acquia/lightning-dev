@@ -186,14 +186,21 @@ class RoboFile extends Tasks
      * @param string $version
      *   The version the fixture represents.
      *
+     * @option $update-from The version from which to update before generating
+     * the fixture. If omitted, the fixture is created from a clean install.
+     *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      */
-    public function makeFixture ($version)
+    public function makeFixture ($version, array $options = [
+        'update-from' => NULL,
+    ])
     {
         return $this->collectionBuilder()
             ->addTask(
-                $this->reinstall()
+                $options['update-from']
+                    ? $this->update($options['update-from'])
+                    : $this->reinstall()
             )
             ->addTask(
                 $this->taskDrush('sql:dump')
