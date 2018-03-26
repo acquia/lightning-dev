@@ -33,6 +33,38 @@ class RoboFile extends Tasks
     }
 
     /**
+     * Checks if Drush or Console implements a specific command.
+     *
+     * @param string $executable
+     *   The relative path to the executable, e.g. 'vendor/bin/drush'.
+     * @param string $command
+     *   The command to check for.
+     *
+     * @return bool
+     *   TRUE if the command exists, FALSE otherwise.
+     */
+    protected function commandExists ($executable, $command)
+    {
+        $list = $this->taskExec($executable)
+            ->rawArg('list')
+            ->option('format', 'json')
+            ->printOutput(FALSE)
+            ->run()
+            ->getMessage();
+
+        $list = Json::decode($list);
+
+        foreach ($list['commands'] as $command_info)
+        {
+            if ($command_info['name'] === $command)
+            {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+
+    /**
      * Installs Lightning and, optionally, the developer tools.
      *
      * @param string $db_url
@@ -83,14 +115,17 @@ class RoboFile extends Tasks
             break;
         }
 
-        if (isset($extension, $info) && $extension !== $profile)
+        if (isset($extension, $info) && $info['type'] === 'module')
         {
-          $install = isset($info['components']) ? $info['components'] : [];
-          array_push($install, $extension);
+            $task = $this->taskDrush('pm-enable')
+                ->option('yes')
+                ->arg($extension);
 
-          $tasks->addTask(
-              $this->taskDrush('pm-enable')->args($install)->option('yes')
-          );
+            if (isset($info['components']))
+            {
+                $task->args($info['components']);
+            }
+            $tasks->addTask($task);
         }
 
         if ($options['no-dev'] == FALSE)
@@ -135,26 +170,20 @@ class RoboFile extends Tasks
      */
     public function installDev ($db_url, $base_url = NULL)
     {
-        $extender_dir = "docroot/profiles/custom/lightning_extender";
-
         return $this->collectionBuilder()
             ->addTask(
-                $this->taskDrush('pm-enable')->arg('lightning_dev')->option('yes')
+                $this->taskDrush('pm-enable')
+                    ->arg('lightning_dev')
+                    ->option('yes')
             )
-            ->addTask(
-                $this->taskDeleteDir($extender_dir)
-            )
-            ->addTask(
-                $this->taskExec('vendor/bin/drupal')
-                    ->rawArg('lightning:subprofile')
-                    ->options([
-                        'no-interaction' => NULL,
-                        'name' => 'Lightning Extender',
-                        'machine-name' => basename($extender_dir),
-                        'include' => 'devel',
-                        'exclude' => 'lightning_search',
-                    ])
-            )
+            ->addCode(function ()
+            {
+                $task = $this->makeExtender();
+                if ($task)
+                {
+                    $task->run();
+                }
+            })
             ->addTask(
                 $this->configurePhpUnit($db_url, $base_url)
             )
@@ -194,6 +223,45 @@ class RoboFile extends Tasks
         );
 
         return $this->install($db_url, $info['install-profile'], $base_url);
+    }
+
+    /**
+     * Generates a sub-profile of Lightning.
+     *
+     * @param string $name
+     *   (optional) The machine name of the profile. Defaults to
+     *   'lightning_extender'.
+     *
+     * @return \Robo\Contract\TaskInterface
+     *   The task to execute.
+     */
+    public function makeExtender ($name = 'lightning_extender')
+    {
+        $console = 'vendor/bin/drupal';
+        $command = 'lightning:subprofile';
+
+        if ($this->commandExists($console, $command))
+        {
+            $dir = "docroot/profiles/custom/$name";
+
+            return $this->collectionBuilder()
+                ->addTask(
+                    $this->taskDeleteDir($dir)
+                )
+                ->addTask(
+                    $this->taskExec($console)
+                        ->rawArg($command)
+                        ->option('no-interaction')
+                        ->option('name', 'Lightning Extender')
+                        ->option('machine-name', basename($dir))
+                        ->option('include', 'devel')
+                        ->option('exclude', 'lightning_search')
+                );
+        }
+        else
+        {
+            $this->say("The $command command is not available.");
+        }
     }
 
     /**
