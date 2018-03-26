@@ -135,9 +135,25 @@ class RoboFile extends Tasks
      */
     public function installDev ($db_url, $base_url = NULL)
     {
+        $extender_dir = "docroot/profiles/custom/lightning_extender";
+
         return $this->collectionBuilder()
             ->addTask(
                 $this->taskDrush('pm-enable')->arg('lightning_dev')->option('yes')
+            )
+            ->addTask(
+                $this->taskDeleteDir($extender_dir)
+            )
+            ->addTask(
+                $this->taskExec('vendor/bin/drupal')
+                    ->rawArg('lightning:subprofile')
+                    ->options([
+                        'no-interaction' => NULL,
+                        'name' => 'Lightning Extender',
+                        'machine-name' => basename($extender_dir),
+                        'include' => 'devel',
+                        'exclude' => 'lightning_search',
+                    ])
             )
             ->addTask(
                 $this->configurePhpUnit($db_url, $base_url)
