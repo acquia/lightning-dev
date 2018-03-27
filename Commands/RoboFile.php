@@ -231,37 +231,52 @@ class RoboFile extends Tasks
      * @param string $name
      *   (optional) The machine name of the profile. Defaults to
      *   'lightning_extender'.
+     * @param array $options
+     *   (optional) Additional command options.
      *
-     * @return \Robo\Contract\TaskInterface
-     *   The task to execute.
+     * @option $overwrite Overwrite the sub-profile if it already exists.
+     *
+     * @return \Robo\Contract\TaskInterface|NULL
+     *   The task to execute, or NULL if nothing should be done.
      */
-    public function makeExtender ($name = 'lightning_extender')
+    public function makeExtender ($name = 'lightning_extender', array $options = [
+        'overwrite' => FALSE,
+    ])
     {
         $console = 'vendor/bin/drupal';
         $command = 'lightning:subprofile';
 
         if ($this->commandExists($console, $command))
         {
-            $dir = "docroot/profiles/custom/$name";
+            $tasks = $this->collectionBuilder();
 
-            return $this->collectionBuilder()
-                ->addTask(
-                    $this->taskDeleteDir($dir)
-                )
-                ->addTask(
-                    $this->taskExec($console)
-                        ->rawArg($command)
-                        ->option('no-interaction')
-                        ->option('name', 'Lightning Extender')
-                        ->option('machine-name', basename($dir))
-                        ->option('include', 'devel')
-                        ->option('exclude', 'lightning_search')
-                );
+            $dir = "docroot/profiles/custom/$name";
+            if (is_dir($dir))
+            {
+                if ($options['overwrite'])
+                {
+                    $tasks->addTask(
+                        $this->taskDeleteDir($dir)
+                    );
+                }
+                else
+                {
+                    return $this->say("$dir already exists.");
+                }
+            }
+
+            return $tasks->addTask(
+                $this->taskExec($console)
+                    ->rawArg($command)
+                    ->option('no-interaction')
+                    ->option('name', 'Lightning Extender')
+                    ->option('machine-name', basename($dir))
+                    ->option('include', 'devel')
+                    ->option('exclude', 'lightning_search')
+            );
         }
-        else
-        {
-            $this->say("The $command command is not available.");
-        }
+
+        return $this->say("The $command command is not available.");
     }
 
     /**
