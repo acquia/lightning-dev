@@ -8,17 +8,15 @@ if ($phar)
 }
 else
 {
-    // Running in the Drupal root.
-    if (file_exists('autoload.php'))
-    {
-        require_once 'autoload.php';
-    }
-
-    // Running in the repository root.
-    else if (file_exists('vendor/autoload.php'))
-    {
-        require_once 'vendor/autoload.php';
-    }
+    // Look for the autoloader in various places, and load the first one we
+    // find.
+    $autoloaders = [
+        'Drupal root' => 'autoload.php',
+        'Drupal root or repository root' => 'vendor/autoload.php',
+        'Repository root' => 'docroot/vendor/autoload.php',
+    ];
+    $autoloaders = array_filter($autoloaders, 'file_exists');
+    require_once reset($autoloaders);
 }
 
 $out = new \Symfony\Component\Console\Output\ConsoleOutput();
