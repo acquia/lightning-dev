@@ -4,6 +4,7 @@ namespace Acquia\Lightning\Commands;
 
 use Composer\Installers\DrupalInstaller;
 use Composer\Script\Event;
+use Composer\Util\ProcessExecutor;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -30,34 +31,21 @@ class FileCommands
     {
         $destination = static::getDestination($event);
 
+        $composer = $event->getComposer();
+
+        $archive = $composer->getArchiveManager()->archive(
+            $composer->getPackage(),
+            'tar',
+            dirname($destination)
+        );
+
         $file_system = new Filesystem();
+        $file_system->remove($destination);
         $file_system->mkdir($destination);
 
-        /** @var Finder $finder */
-        $finder = Finder::create()
-            ->files()
-            ->in('.')
-            ->exclude(['docroot', 'vendor'])
-            ->ignoreVCS(TRUE)
-            ->ignoreDotFiles(TRUE);
-
-        $count = count($finder);
-        if ($count === 0)
-        {
-            return;
-        }
-
-        $io = $event->getIO();
-        $io->write("Copying $count file(s) to $destination...");
-
-        foreach ($finder as $file)
-        {
-            $path = $file->getPathname();
-            // Replace the initial ./ with the destination path.
-            $copy_to = preg_replace('/^\.\//', $destination . '/', $path);
-            $file_system->copy($path, $copy_to);
-            $io->write($path);
-        }
+        $process_executor = new ProcessExecutor($event->getIO());
+        $process_executor->execute("tar -x -f $archive -C $destination");
+        $file_system->remove($archive);
     }
 
     public static function pull (Event $event)
