@@ -8,21 +8,16 @@ if ($phar)
 }
 else
 {
-    $path = ['docroot', 'vendor', 'autoload.php'];
-
-    while ($path)
+    // Running in the Drupal root.
+    if (file_exists('autoload.php'))
     {
-        $autoload = implode('/', $path);
+        require_once 'autoload.php';
+    }
 
-        if (file_exists($autoload))
-        {
-            require_once $autoload;
-            break;
-        }
-        else
-        {
-            array_shift($path);
-        }
+    // Running in the repository root.
+    else if (file_exists('vendor/autoload.php'))
+    {
+        require_once 'vendor/autoload.php';
     }
 }
 
