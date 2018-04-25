@@ -502,4 +502,38 @@ class RoboFile extends Tasks
                     ])
             );
     }
+
+    /**
+     * Switches all Composer dependencies back to dev.
+     *
+     * @return \Robo\Task\Composer\RequireDependency
+     *   The task to execute.
+     */
+    public function useDev ()
+    {
+        $composer = file_get_contents('composer.json');
+        $composer = json_decode($composer, TRUE);
+
+        /** @var \Robo\Task\Composer\RequireDependency $task */
+        $task = $this->taskComposerRequire()->option('no-update');
+
+        foreach ($composer['require'] as $package => $constraint)
+        {
+            // Remove any character that isn't a number or a period.
+            $constraint = preg_replace('/[^0-9\.]+/', NULL, $constraint);
+
+            if ($package === 'drupal/core')
+            {
+                // 8.5.3 --> 8.5.x-dev
+                $task->dependency($package, preg_replace('/\.[0-9]+$/', '.x-dev', $constraint));
+            }
+            elseif (strpos($package, 'drupal/lightning_') === 0)
+            {
+                // 2.1 --> 2.x-dev
+                $task->dependency($package, preg_replace('/^([0-9])+\..*/', '$1.x-dev', $constraint));
+            }
+        }
+
+        return $task;
+    }
 }
