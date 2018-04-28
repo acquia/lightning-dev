@@ -23,7 +23,7 @@
         "drush/drush": "^9",
         "consolidation/robo": "^1.2",
         "drupal/config_installer": "^1.6",
-        "drupal/console": "^1.0",
+        "drupal/console": "^1.8",
         "dmore/behat-chrome-extension": "^1.1"
     },
     "require-dev": {
