@@ -19,10 +19,6 @@ default:
       selenium2:
         wd_host: 'http://127.0.0.1:4444/wd/hub'
         browser: chrome
-      sessions:
-        chrome:
-          chrome:
-            api_url: 'http://localhost:9222'
     'Drupal\DrupalExtension':
       api_driver: drupal
       blackbox: null
@@ -34,4 +30,3 @@ default:
         error_message_selector: '.messages [role="alert"]'
         warning_message_selector: '.messages--warning'
         login_form_selector: '#user-login-form'
-    'DMore\ChromeExtension\Behat\ServiceContainer\ChromeExtension': ~
