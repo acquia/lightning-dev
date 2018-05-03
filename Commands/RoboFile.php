@@ -495,10 +495,12 @@ class RoboFile extends Tasks
                     ->from([
                         '<env name="SIMPLETEST_DB" value=""/>',
                         '<env name="SIMPLETEST_BASE_URL" value=""/>',
+                        '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>',
                     ])
                     ->to([
                         '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
                         '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
+                        '<env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>',
                     ])
             );
     }
