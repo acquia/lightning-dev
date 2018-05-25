@@ -471,14 +471,33 @@ class RoboFile extends Tasks
      * @param string $base_url
      *   (optional) The URL of the Drupal site.
      *
+     * @option $with-deprecations If set, enable PHPUnit deprecation testing.
+     *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      *
      * @command configure:phpunit
      */
-    public function configurePhpUnit ($db_url, $base_url = NULL)
+    public function configurePhpUnit ($db_url, $base_url = NULL, array $options = [
+        'with-deprecations' => FALSE,
+    ])
     {
         $conf = 'docroot/core/phpunit.xml';
+
+        $search = [
+            '<env name="SIMPLETEST_DB" value=""/>',
+            '<env name="SIMPLETEST_BASE_URL" value=""/>',
+        ];
+        $replace = [
+            '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
+            '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
+        ];
+
+        if (empty($options['with-deprecations']))
+        {
+            $search[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>';
+            $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>';
+        }
 
         return $this->collectionBuilder()
             ->addTask(
@@ -491,15 +510,7 @@ class RoboFile extends Tasks
                     ])
             )
             ->addTask(
-                $this->taskReplaceInFile($conf)
-                    ->from([
-                        '<env name="SIMPLETEST_DB" value=""/>',
-                        '<env name="SIMPLETEST_BASE_URL" value=""/>',
-                    ])
-                    ->to([
-                        '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
-                        '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
-                    ])
+                $this->taskReplaceInFile($conf)->from($search)->to($replace)
             );
     }
 
