@@ -495,7 +495,7 @@ class RoboFile extends Tasks
 
         if (empty($options['with-deprecations']))
         {
-            $search[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>';
+            $search[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>';
             $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>';
         }
 
