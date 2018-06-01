@@ -87,6 +87,7 @@ class RoboFile extends Tasks
         'from-config' => FALSE,
     ])
     {
+        $db_url = stripslashes($db_url);
         $settings = 'docroot/sites/default/settings.php';
 
         $tasks = $this->collectionBuilder()
@@ -95,7 +96,7 @@ class RoboFile extends Tasks
                     ->arg($profile)
                     ->option('yes')
                     ->option('account-pass', 'admin')
-                    ->option('db-url', stripslashes($db_url))
+                    ->option('db-url', $db_url)
             )
             ->addTask(
                 $this->taskFilesystemStack()
@@ -151,6 +152,7 @@ class RoboFile extends Tasks
                         ->arg('config_installer')
                         ->option('yes')
                         ->option('account-pass', 'admin')
+                        ->option('db-url', $db_url)
                 );
         }
 
