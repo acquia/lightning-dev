@@ -500,6 +500,7 @@ class RoboFile extends Tasks
             $search[] = '<!-- <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/> -->';
             $search[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>';
             $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>';
+            $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>';
         }
 
         return $this->collectionBuilder()
