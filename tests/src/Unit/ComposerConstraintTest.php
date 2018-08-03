@@ -47,8 +47,8 @@ class ComposerConstraintTest extends UnitTestCase {
         'expected' => '1.x-dev',
       ],
       [
-        'range' => '^2.5',
-        'expected' => '2.x-dev',
+        'range' => '^1.3.0',
+        'expected' => '1.x-dev',
       ],
     ];
   }
@@ -89,26 +89,51 @@ class ComposerConstraintTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider getDevProvider
+   * @dataProvider getLightningDevProvider
    */
-  public function testGetDev($constraint, $expected) {
-    $actual = (new ComposerConstraint($constraint))->getCoreDev();
+  public function testGetLightningDev($constraint, $expected) {
+    $actual = (new ComposerConstraint($constraint))->getLightningDev();
     $this->assertEquals($expected, $actual);
   }
 
-  public function getDevProvider() {
+  public function getLightningDevProvider() {
     return [
       [
-        'contraint' => '2.8',
-        'expected' => '2.x-dev',
+        'contraint' => '1.3.0',
+        'expected' => '1.x-dev',
       ],
       [
-        'contraint' => '^2.8',
-        'expected' => '2.x-dev',
+        'contraint' => '^1.3.0',
+        'expected' => '1.x-dev',
       ],
       [
-        'contraint' => '^2.8 || ^3.0',
-        'expected' => '2.x-dev || 3.x-dev',
+        'contraint' => '^1.3.0 || ^2.3.0',
+        'expected' => '1.x-dev || 2.x-dev',
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider getCoreDevProvider
+   */
+  public function testGetCoreDev($contraint, $expected) {
+    $actual = (new ComposerConstraint($contraint))->getCoreDev();
+    $this->assertEquals($expected, $actual);
+  }
+
+  public function getCoreDevProvider() {
+    return [
+      [
+        'range' => '8.5.3',
+        'expected' => '8.5.x-dev',
+      ],
+      [
+        'range' => '^8.5.3',
+        'expected' => '8.5.x-dev',
+      ],
+      [
+        'range' => '8.5.3 || 8.6.3',
+        'expected' => '8.5.x-dev || 8.6.x-dev',
       ],
     ];
   }
