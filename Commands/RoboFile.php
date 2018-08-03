@@ -4,6 +4,7 @@ namespace Acquia\Lightning\Commands;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\lightning_dev\ComposerConstraint;
 use Robo\Tasks;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -534,18 +535,10 @@ class RoboFile extends Tasks
 
         foreach ($composer['require'] as $package => $constraint)
         {
-            // Remove any character that isn't a number or a period.
-            $constraint = preg_replace('/[^0-9\.]+/', NULL, $constraint);
-
-            if ($package === 'drupal/core')
+            if ($package === 'drupal/core' || strpos($package, 'drupal/lightning_') === 0)
             {
-                // 8.5.3 --> 8.5.x-dev
-                $task->dependency($package, preg_replace('/\.[0-9]+$/', '.x-dev', $constraint));
-            }
-            elseif (strpos($package, 'drupal/lightning_') === 0)
-            {
-                // 2.1 --> 2.x-dev
-                $task->dependency($package, preg_replace('/^([0-9])+\..*/', '$1.x-dev', $constraint));
+              $composer_constraint = new ComposerConstraint($constraint);
+              $task->dependency($package, $composer_constraint->getDev());
             }
         }
 

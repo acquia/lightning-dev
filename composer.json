@@ -47,7 +47,8 @@
     },
     "autoload": {
         "classmap": [
-            "Commands/"
+            "Commands/",
+            "src/"
         ]
     },
     "bin": [
