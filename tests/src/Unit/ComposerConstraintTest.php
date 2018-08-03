@@ -12,26 +12,43 @@ use Drupal\Tests\UnitTestCase;
 class ComposerConstraintTest extends UnitTestCase {
 
   /**
-   * @dataProvider rangeToDevProvider
+   * @dataProvider coreRangeToDevProvider
    */
-  public function testRangeToDev($range, $expected) {
-    $actual = ComposerConstraint::rangeToDev($range);
+  public function testCoreRangeToDev($range, $expected) {
+    $actual = ComposerConstraint::coreRangeToDev($range);
     $this->assertEquals($expected, $actual);
   }
 
-  public function rangeToDevProvider() {
+  public function coreRangeToDevProvider() {
     return [
-      [
-        'range' => '2.1',
-        'expected' => '2.x-dev',
-      ],
-      [
-        'range' => '^2.8',
-        'expected' => '2.x-dev',
-      ],
       [
         'range' => '8.5.3',
         'expected' => '8.5.x-dev',
+      ],
+      [
+        'range' => '^8.5.3',
+        'expected' => '8.5.x-dev',
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider lightningRangeToDevProvider
+   */
+  public function testLightningRangeToDev($range, $expected) {
+    $actual = ComposerConstraint::lightningRangeToDev($range);
+    $this->assertEquals($expected, $actual);
+  }
+
+  public function lightningRangeToDevProvider() {
+    return [
+      [
+        'range' => '1.3.0',
+        'expected' => '1.x-dev',
+      ],
+      [
+        'range' => '^2.5',
+        'expected' => '2.x-dev',
       ],
     ];
   }
@@ -75,7 +92,7 @@ class ComposerConstraintTest extends UnitTestCase {
    * @dataProvider getDevProvider
    */
   public function testGetDev($constraint, $expected) {
-    $actual = (new ComposerConstraint($constraint))->getDev();
+    $actual = (new ComposerConstraint($constraint))->getCoreDev();
     $this->assertEquals($expected, $actual);
   }
 

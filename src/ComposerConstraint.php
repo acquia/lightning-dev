@@ -30,14 +30,31 @@ class ComposerConstraint {
 
   /**
    * @return string
+   *   E.g. '8.4.x-dev || 8.5.x-dev'.
+   */
+  public function getCoreDev() {
+    return $this->getDev([static::class, 'coreRangeToDev']);
+  }
+
+  /**
+   * @return string
    *   E.g. '2.x-dev || 3.x-dev'.
    */
-  public function getDev() {
+  public function getLightningDev() {
+    return $this->getDev([static::class, 'lightningRangeToDev']);
+  }
+
+  /**
+   * @param callable $callback
+   *
+   * @return string
+   */
+  private function getDev($callback) {
     $dev = $this->constraint;
     $ranges = $this->getRanges();
 
     foreach ($ranges as $oldRange) {
-      $newRange = static::rangeToDev($oldRange);
+      $newRange = $callback($oldRange);
       $dev = str_replace($oldRange, $newRange, $dev);
     }
 
@@ -46,13 +63,26 @@ class ComposerConstraint {
 
   /**
    * @param string $range
-   *   E.g. '^2.8'.
+   *   E.g. '8.5.3'.
    * @return string
-   *   E.g. '2.x-dev'.
+   *   E.g. '8.5.x-dev'.
    */
-  public static function rangeToDev($range) {
+  public static function coreRangeToDev($range) {
     $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
     $dev = preg_replace('/\.[0-9]+$/', '.x-dev', $numeric);
+
+    return $dev;
+  }
+
+  /**
+   * @param string $range
+   *   E.g. '1.3.0'.
+   * @return string
+   *   E.g. '1.x-dev'.
+   */
+  public static function lightningRangeToDev($range) {
+    $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
+    $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $numeric);
 
     return $dev;
   }
