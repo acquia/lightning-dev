@@ -124,15 +124,15 @@ class ComposerConstraintTest extends UnitTestCase {
   public function getCoreDevProvider() {
     return [
       [
-        'range' => '8.5.3',
+        'contraint' => '8.5.3',
         'expected' => '8.5.x-dev',
       ],
       [
-        'range' => '^8.5.3',
+        'contraint' => '^8.5.3',
         'expected' => '8.5.x-dev',
       ],
       [
-        'range' => '8.5.3 || 8.6.3',
+        'contraint' => '8.5.3 || 8.6.3',
         'expected' => '8.5.x-dev || 8.6.x-dev',
       ],
     ];
