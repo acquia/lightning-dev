@@ -1,5 +1,7 @@
 <?php
 
+namespace Drupal\Tests\lightning_dev\Unit;
+
 use Drupal\lightning_dev\ComposerConstraint;
 use Drupal\Tests\UnitTestCase;
 

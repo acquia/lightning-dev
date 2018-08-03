@@ -537,8 +537,8 @@ class RoboFile extends Tasks
         {
             if ($package === 'drupal/core' || strpos($package, 'drupal/lightning_') === 0)
             {
-              $composer_constraint = new ComposerConstraint($constraint);
-              $task->dependency($package, $composer_constraint->getDev());
+                $composer_constraint = new ComposerConstraint($constraint);
+                $task->dependency($package, $composer_constraint->getDev());
             }
         }
 
