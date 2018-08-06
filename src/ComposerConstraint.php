@@ -2,9 +2,14 @@
 
 namespace Drupal\lightning_dev;
 
-class ComposerConstraint {
+/**
+ * Class to perform operations on a composer constraint.
+ */
+final class ComposerConstraint {
 
   /**
+   * Raw constraint.
+   *
    * E.g. '^2.8 || ^3.0'.
    *
    * @var string
@@ -12,15 +17,23 @@ class ComposerConstraint {
   private $constraint = '';
 
   /**
+   * ComposerConstraint constructor.
+   *
    * @param string $constraint
+   *   Raw constraint.
    */
   public function __construct($constraint) {
     $this->constraint = $constraint;
   }
 
   /**
+   * Returns the constraint's ranges as an array.
+   *
+   * @see https://getcomposer.org/doc/articles/versions.md#version-range
+   *
    * @return string[]
-   *   E.g. ['^2.8', '^3.0'].
+   *   Constraint's ranges, for example if the constraint is '^2.8 || ^3.0',
+   *   it will return ['^2.8', '^3.0'].
    */
   public function getRanges() {
     preg_match_all('/[0-9a-zA-Z\~\>\=\-\<\.\^\*]+/', $this->constraint, $matches);
