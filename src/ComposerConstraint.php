@@ -52,7 +52,7 @@ final class ComposerConstraint {
    *   '8.4.3 || ^8.5.3', it will be '8.4.x-dev || 8.5.x-dev'.
    */
   public function getCoreDev() {
-    return $this->getDev([static::class, 'coreRangeToDev']);
+    return $this->getDev([$this, 'coreRangeToDev']);
   }
 
   /**
@@ -66,7 +66,7 @@ final class ComposerConstraint {
    *   '^1.3.0 || ^2.3.0', it will be '1.x-dev || 2.x-dev'.
    */
   public function getLightningDev() {
-    return $this->getDev([static::class, 'lightningRangeToDev']);
+    return $this->getDev([$this, 'lightningRangeToDev']);
   }
 
   /**
@@ -85,9 +85,9 @@ final class ComposerConstraint {
     $ranges = $this->getRanges();
     $replace_pairs = [];
 
-    foreach ($ranges as $oldRange) {
-      $newRange = $callback($oldRange);
-      $replace_pairs[$oldRange] = $newRange;
+    foreach ($ranges as $old_range) {
+      $new_range = $callback($old_range);
+      $replace_pairs[$old_range] = $new_range;
     }
 
     return strtr($this->constraint, $replace_pairs);
@@ -105,8 +105,8 @@ final class ComposerConstraint {
    * @return string
    *   Core dev version of range. E.g. '8.5.x-dev'.
    */
-  private static function coreRangeToDev($range) {
-    $stripped = static::stripOperators($range);
+  private function coreRangeToDev($range) {
+    $stripped = $this->stripOperators($range);
     $dev = preg_replace('/\.[0-9]+$/', '.x-dev', $stripped);
 
     return $dev;
@@ -124,8 +124,8 @@ final class ComposerConstraint {
    * @return string
    *   Lightning dev version of range. E.g. '1.x-dev'.
    */
-  private static function lightningRangeToDev($range) {
-    $stripped = static::stripOperators($range);
+  private function lightningRangeToDev($range) {
+    $stripped = $this->stripOperators($range);
     $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $stripped);
 
     return $dev;
@@ -140,7 +140,7 @@ final class ComposerConstraint {
    * @return string
    *   Operator free version of range. E.g. '1.3.0'.
    */
-  private static function stripOperators($range) {
+  private function stripOperators($range) {
     $stripped = preg_replace('/[^0-9\.]+/', NULL, $range);
 
     return $stripped;
