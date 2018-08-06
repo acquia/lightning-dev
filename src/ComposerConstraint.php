@@ -32,7 +32,7 @@ final class ComposerConstraint {
    * @see https://getcomposer.org/doc/articles/versions.md#version-range
    *
    * @return string[]
-   *   Constraint's ranges, for example if the constraint is '^2.8 || ^3.0',
+   *   Constraint's ranges. For example, if the constraint is '^2.8 || ^3.0',
    *   it will return ['^2.8', '^3.0'].
    */
   private function getRanges() {
@@ -42,16 +42,28 @@ final class ComposerConstraint {
   }
 
   /**
+   * Returns the core dev version of the constraint.
+   *
+   * In the core dev version the last digits of the constraint's ranges are
+   * replaced by the string 'x-dev', and their operators are removed.
+   *
    * @return string
-   *   E.g. '8.4.x-dev || 8.5.x-dev'.
+   *   Core dev version. For example, if the constraint is '8.4.3 || ^8.5.3',
+   *   it will return '8.4.x-dev || 8.5.x-dev'.
    */
   public function getCoreDev() {
     return $this->getDev([static::class, 'coreRangeToDev']);
   }
 
   /**
+   * Returns the lightning dev version of the constraint.
+   *
+   * In the lightning dev version the first digits of the constraint's ranges are
+   * concatenated with the string 'x-dev', and their operators are removed.
+   *
    * @return string
-   *   E.g. '2.x-dev || 3.x-dev'.
+   *   Lightning dev version. For example, if the constraint is '^1.3.0 || ^2.3.0',
+   *   it will return '1.x-dev || 2.x-dev'.
    */
   public function getLightningDev() {
     return $this->getDev([static::class, 'lightningRangeToDev']);
