@@ -12,6 +12,13 @@ use Drupal\Tests\UnitTestCase;
 class ComposerConstraintTest extends UnitTestCase {
 
   /**
+   * Tests getting constraints' lightning dev versions.
+   *
+   * @param string $constraint
+   *   Raw constraint.
+   * @param string $expected
+   *   Expected lightning dev version of constraint.
+   *
    * @dataProvider getLightningDevProvider
    */
   public function testGetLightningDev($constraint, $expected) {
@@ -19,6 +26,12 @@ class ComposerConstraintTest extends UnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  /**
+   * Data provider for ::testGetLightningDev().
+   *
+   * @return array
+   *   The test data.
+   */
   public function getLightningDevProvider() {
     return [
       'first digits and x-dev' => [
@@ -37,6 +50,13 @@ class ComposerConstraintTest extends UnitTestCase {
   }
 
   /**
+   * Tests getting constraints' core dev versions.
+   *
+   * @param string $constraint
+   *   Raw constraint.
+   * @param string $expected
+   *   Expected core dev version of constraint.
+   *
    * @dataProvider getCoreDevProvider
    */
   public function testGetCoreDev($constraint, $expected) {
@@ -44,6 +64,12 @@ class ComposerConstraintTest extends UnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  /**
+   * Data provider for ::testGetCoreDev().
+   *
+   * @return array
+   *   The test data.
+   */
   public function getCoreDevProvider() {
     return [
       'last digits to x-dev' => [
