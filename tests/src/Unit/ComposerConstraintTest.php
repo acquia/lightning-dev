@@ -30,7 +30,7 @@ class ComposerConstraintTest extends UnitTestCase {
         'expected' => '1.x-dev',
       ],
       [
-        'constraint' => '^1.3.0 || ^2.3.0',
+        'constraint' => '^1.3.0 || ~2.3.0',
         'expected' => '1.x-dev || 2.x-dev',
       ],
     ];
@@ -55,7 +55,7 @@ class ComposerConstraintTest extends UnitTestCase {
         'expected' => '8.5.x-dev',
       ],
       [
-        'constraint' => '8.5.3 || 8.6.3',
+        'constraint' => '~8.5.3 || ^8.6.3',
         'expected' => '8.5.x-dev || 8.6.x-dev',
       ],
     ];
