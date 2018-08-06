@@ -35,7 +35,7 @@ final class ComposerConstraint {
    *   Constraint's ranges, for example if the constraint is '^2.8 || ^3.0',
    *   it will return ['^2.8', '^3.0'].
    */
-  public function getRanges() {
+  private function getRanges() {
     preg_match_all('/[0-9a-zA-Z\~\>\=\-\<\.\^\*]+/', $this->constraint, $matches);
 
     return $matches[0];
@@ -80,7 +80,7 @@ final class ComposerConstraint {
    * @return string
    *   E.g. '8.5.x-dev'.
    */
-  public static function coreRangeToDev($range) {
+  private static function coreRangeToDev($range) {
     $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
     $dev = preg_replace('/\.[0-9]+$/', '.x-dev', $numeric);
 
@@ -93,7 +93,7 @@ final class ComposerConstraint {
    * @return string
    *   E.g. '1.x-dev'.
    */
-  public static function lightningRangeToDev($range) {
+  private static function lightningRangeToDev($range) {
     $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
     $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $numeric);
 
