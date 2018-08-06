@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\lightning_dev;
+namespace Acquia\Lightning\Commands;
 
 /**
  * Class to perform operations on a composer constraint.
@@ -126,7 +126,7 @@ final class ComposerConstraint {
    */
   private function lightningRangeToDev($range) {
     $stripped = $this->stripOperators($range);
-    $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $stripped);
+    $dev = preg_replace('/^([0-9]+)\..*/', '$1.x-dev', $stripped);
 
     return $dev;
   }
