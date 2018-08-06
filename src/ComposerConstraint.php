@@ -82,15 +82,15 @@ final class ComposerConstraint {
    *   Dev version.
    */
   private function getDev(callable $callback) {
-    $dev = $this->constraint;
     $ranges = $this->getRanges();
+    $replace_pairs = [];
 
     foreach ($ranges as $oldRange) {
       $newRange = $callback($oldRange);
-      $dev = str_replace($oldRange, $newRange, $dev);
+      $replace_pairs[$oldRange] = $newRange;
     }
 
-    return $dev;
+    return strtr($this->constraint, $replace_pairs);
   }
 
   /**
