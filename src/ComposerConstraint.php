@@ -70,11 +70,18 @@ final class ComposerConstraint {
   }
 
   /**
+   * Returns the dev version of the constraint.
+   *
+   * In the dev version the constraint's ranges are replaced with the
+   * result of the callback.
+   *
    * @param callable $callback
+   *   Transformation to apply to each range.
    *
    * @return string
+   *   Dev version.
    */
-  private function getDev($callback) {
+  private function getDev(callable $callback) {
     $dev = $this->constraint;
     $ranges = $this->getRanges();
 
@@ -87,10 +94,16 @@ final class ComposerConstraint {
   }
 
   /**
+   * Returns the core dev version of a given range.
+   *
+   * In the core dev version the last digits of the range are replaced by
+   * the string 'x-dev', and the operators are removed.
+   *
    * @param string $range
-   *   E.g. '8.5.3'.
+   *   Range. E.g. '^8.5.3'.
+   *
    * @return string
-   *   E.g. '8.5.x-dev'.
+   *   Core dev version of range. E.g. '8.5.x-dev'.
    */
   private static function coreRangeToDev($range) {
     $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
@@ -100,10 +113,16 @@ final class ComposerConstraint {
   }
 
   /**
+   * Returns the lightning dev version of a given range.
+   *
+   * In the lightning dev version the first digits of the range are
+   * concatenated with the string 'x-dev', and the operators are removed.
+   *
    * @param string $range
-   *   E.g. '1.3.0'.
+   *   Range. E.g. '^1.3.0'.
+   *
    * @return string
-   *   E.g. '1.x-dev'.
+   *   Lightning dev version of range. E.g. '1.x-dev'.
    */
   private static function lightningRangeToDev($range) {
     $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
