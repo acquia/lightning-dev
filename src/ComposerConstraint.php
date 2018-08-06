@@ -106,8 +106,8 @@ final class ComposerConstraint {
    *   Core dev version of range. E.g. '8.5.x-dev'.
    */
   private static function coreRangeToDev($range) {
-    $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
-    $dev = preg_replace('/\.[0-9]+$/', '.x-dev', $numeric);
+    $stripped = static::stripOperators($range);
+    $dev = preg_replace('/\.[0-9]+$/', '.x-dev', $stripped);
 
     return $dev;
   }
@@ -125,10 +125,25 @@ final class ComposerConstraint {
    *   Lightning dev version of range. E.g. '1.x-dev'.
    */
   private static function lightningRangeToDev($range) {
-    $numeric = preg_replace('/[^0-9\.]+/', NULL, $range);
-    $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $numeric);
+    $stripped = static::stripOperators($range);
+    $dev = preg_replace('/^([0-9])+\..*/', '$1.x-dev', $stripped);
 
     return $dev;
+  }
+
+  /**
+   * Returns the operator free version of a given range.
+   *
+   * @param string $range
+   *   Range. E.g. '^1.3.0'.
+   *
+   * @return string
+   *   Operator free version of range. E.g. '1.3.0'.
+   */
+  private static function stripOperators($range) {
+    $stripped = preg_replace('/[^0-9\.]+/', NULL, $range);
+
+    return $stripped;
   }
 
 }
