@@ -487,10 +487,12 @@ class RoboFile extends Tasks
         $conf = 'docroot/core/phpunit.xml';
 
         $search = [
+            'bootstrap="tests/bootstrap.php"',
             '<env name="SIMPLETEST_DB" value=""/>',
             '<env name="SIMPLETEST_BASE_URL" value=""/>',
         ];
         $replace = [
+            'bootstrap="../../vendor/weitzman/drupal-test-traits/src/bootstrap.php"',
             '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
             '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
         ];
