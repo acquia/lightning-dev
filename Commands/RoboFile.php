@@ -87,6 +87,7 @@ class RoboFile extends Tasks
         'from-config' => FALSE,
     ])
     {
+        $db_url = stripslashes($db_url);
         $settings = 'docroot/sites/default/settings.php';
 
         $tasks = $this->collectionBuilder()
@@ -95,7 +96,7 @@ class RoboFile extends Tasks
                     ->arg($profile)
                     ->option('yes')
                     ->option('account-pass', 'admin')
-                    ->option('db-url', stripslashes($db_url))
+                    ->option('db-url', $db_url)
             )
             ->addTask(
                 $this->taskFilesystemStack()
@@ -151,6 +152,7 @@ class RoboFile extends Tasks
                         ->arg('config_installer')
                         ->option('yes')
                         ->option('account-pass', 'admin')
+                        ->option('db-url', $db_url)
                 );
         }
 
@@ -485,17 +487,21 @@ class RoboFile extends Tasks
         $conf = 'docroot/core/phpunit.xml';
 
         $search = [
+            'bootstrap="tests/bootstrap.php"',
             '<env name="SIMPLETEST_DB" value=""/>',
             '<env name="SIMPLETEST_BASE_URL" value=""/>',
         ];
         $replace = [
+            'bootstrap="../../vendor/weitzman/drupal-test-traits/src/bootstrap.php"',
             '<env name="SIMPLETEST_DB" value="' . stripslashes($db_url) . '"/>',
             '<env name="SIMPLETEST_BASE_URL" value="' . ($base_url ?: static::BASE_URL) . '"/>',
         ];
 
         if (empty($options['with-deprecations']))
         {
+            $search[] = '<!-- <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/> -->';
             $search[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>';
+            $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>';
             $replace[] = '<env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>';
         }
 
@@ -530,18 +536,15 @@ class RoboFile extends Tasks
 
         foreach ($composer['require'] as $package => $constraint)
         {
-            // Remove any character that isn't a number or a period.
-            $constraint = preg_replace('/[^0-9\.]+/', NULL, $constraint);
-
             if ($package === 'drupal/core')
             {
-                // 8.5.3 --> 8.5.x-dev
-                $task->dependency($package, preg_replace('/\.[0-9]+$/', '.x-dev', $constraint));
+                $composer_constraint = new ComposerConstraint($constraint);
+                $task->dependency($package, $composer_constraint->getCoreDev());
             }
             elseif (strpos($package, 'drupal/lightning_') === 0)
             {
-                // 2.1 --> 2.x-dev
-                $task->dependency($package, preg_replace('/^([0-9])+\..*/', '$1.x-dev', $constraint));
+                $composer_constraint = new ComposerConstraint($constraint);
+                $task->dependency($package, $composer_constraint->getLightningDev());
             }
         }
 
