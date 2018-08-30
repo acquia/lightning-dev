@@ -16,7 +16,7 @@ class RoboFile extends Tasks
      *
      * @var string
      */
-    const BASE_URL = 'http://127.0.0.1';
+    const BASE_URL = 'http://127.0.0.1:8080';
 
     /**
      * Builds a task to execute a Drush command.
@@ -68,7 +68,7 @@ class RoboFile extends Tasks
      * Installs Lightning and, optionally, the developer tools.
      *
      * @param string $db_url
-     *   The URL of the Drupal database.
+     *   (optional) The URL of the Drupal database.
      * @param string $profile
      *   (optional) The installation profile to use.
      * @param string $base_url
@@ -82,7 +82,7 @@ class RoboFile extends Tasks
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      */
-    public function install ($db_url, $profile = 'lightning', $base_url = NULL, array $options = [
+    public function install ($db_url = 'sqlite://localhost/db.sqlite', $profile = 'lightning', $base_url = NULL, array $options = [
         'no-dev' => FALSE,
         'from-config' => FALSE,
     ])
