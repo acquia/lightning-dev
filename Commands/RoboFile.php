@@ -2,6 +2,7 @@
 
 namespace Acquia\Lightning\Commands;
 
+use cebe\markdown\GithubMarkdown;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Robo\Tasks;
@@ -354,6 +355,51 @@ class RoboFile extends Tasks
             );
         }
         return $tasks;
+    }
+
+    /**
+     * Generates a change log from CHANGELOG.md.
+     *
+     * @param string $file
+     *   (optional) The file from which to generate the change log, relative to
+     *   the current working directory. Defaults to CHANGELOG.md.
+     *
+     * @option $format The format in which to generate the change log. Defaults
+     * to 'html'. Any other value will generate GitHub-flavored markdown.
+     *
+     * @throws \RuntimeException if $file does not exist or cannot be read.
+     */
+    public function makeChangeLog($file = 'CHANGELOG.md', array $options = [
+        'format' => 'html',
+        'file' => 'CHANGELOG.md',
+    ])
+    {
+        if (! file_exists($file))
+        {
+            throw new \RuntimeException("Cannot find $file.");
+        }
+
+        $handle = fopen($file, 'r');
+        if ($handle === FALSE)
+        {
+            throw new \RuntimeException("Cannot open $file for reading.");
+        }
+
+        $log = [];
+        while ($line = rtrim(fgets($handle)))
+        {
+            array_push($log, $line);
+        }
+        fclose($handle);
+
+        $log = implode("\n", $log);
+
+        if ($options['format'] === 'html')
+        {
+            $log = (new GithubMarkdown())->parse($log);
+        }
+
+        $this->io()->write($log);
     }
 
     /**

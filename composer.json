@@ -27,7 +27,8 @@
         "drupal/config_installer": "^1.6",
         "drupal/console": "^1.8",
         "dmore/behat-chrome-extension": "^1.1",
-        "weitzman/drupal-test-traits": "dev-master"
+        "weitzman/drupal-test-traits": "dev-master",
+        "cebe/markdown": "^1.2"
     },
     "require-dev": {
         "cweagans/composer-patches": "^1.6.4",
