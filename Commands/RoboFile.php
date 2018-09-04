@@ -150,8 +150,8 @@ class RoboFile extends Tasks
                 )
                 ->addTask(
                     $this->taskDrush('site:install')
-                        ->arg('config_installer')
                         ->option('yes')
+                        ->option('existing-config')
                         ->option('account-pass', 'admin')
                         ->option('db-url', $db_url)
                 );
