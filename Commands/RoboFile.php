@@ -292,6 +292,8 @@ class RoboFile extends Tasks
      * most recent fixture, unless --clean is specified.
      * @option $clean If specified, the fixture will be generated from a clean
      * install. This will override the --update-from option.
+     * @option $no-ci If specified, the new fixture will not be added to
+     * .travis.yml for testing.
      *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
@@ -299,6 +301,7 @@ class RoboFile extends Tasks
     public function makeFixture ($version, array $options = [
         'update-from' => NULL,
         'clean' => FALSE,
+        'no-ci' => FALSE,
     ])
     {
         if (empty($options['clean']) && empty($options['update-from']) && is_dir('tests/fixtures'))
@@ -330,7 +333,7 @@ class RoboFile extends Tasks
                 : 'Generating fixture from clean install.'
         );
 
-        return $this->collectionBuilder()
+        $tasks = $this->collectionBuilder()
             ->addTask(
                 $options['update-from']
                     ? $this->update($options['update-from'])
@@ -341,6 +344,16 @@ class RoboFile extends Tasks
                     ->option('gzip')
                     ->option('result-file', "../tests/fixtures/$version.sql")
             );
+
+        if ($options['update-from'] && empty($options['no-ci']) && file_exists('.travis.yml'))
+        {
+            $tasks->addTask(
+                $this->taskReplaceInFile('.travis.yml')
+                    ->from('  - VERSION=' . $options['update-from'])
+                    ->to("  - VERSION=$version")
+            );
+        }
+        return $tasks;
     }
 
     /**
