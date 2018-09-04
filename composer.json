@@ -62,7 +62,8 @@
         "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
         "nuke": "rm -r -f docroot vendor",
         "pull": "Acquia\\Lightning\\Commands\\FileCommands::pull",
-        "push": "Acquia\\Lightning\\Commands\\FileCommands::push"
+        "push": "Acquia\\Lightning\\Commands\\FileCommands::push",
+        "show-stable": "Acquia\\Lightning\\Commands\\ShowStable::execute"
     },
     "extra": {
         "installer-types": [

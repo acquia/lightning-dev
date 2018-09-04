@@ -288,15 +288,48 @@ class RoboFile extends Tasks
      *   The version the fixture represents.
      *
      * @option $update-from The version from which to update before generating
-     * the fixture. If omitted, the fixture is created from a clean install.
+     * the fixture. If omitted, the fixture is created by updating from the
+     * most recent fixture, unless --clean is specified.
+     * @option $clean If specified, the fixture will be generated from a clean
+     * install. This will override the --update-from option.
      *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
      */
     public function makeFixture ($version, array $options = [
         'update-from' => NULL,
+        'clean' => FALSE,
     ])
     {
+        if (empty($options['clean']) && empty($options['update-from']) && is_dir('tests/fixtures'))
+        {
+            $map = function ($fixture)
+            {
+                return basename($fixture, '.sql.gz');
+            };
+            $versions = array_map($map, glob('tests/fixtures/*.sql.gz'));
+
+            if ($versions)
+            {
+                // Sort the available fixtures in descending order.
+                $sort = function ($a, $b)
+                {
+                    return version_compare($a, $b, '<=');
+                };
+                uasort($versions, $sort);
+
+                $options['update-from'] = reset($versions);
+
+                $this->say('Auto-detected most recent fixture: ' . $options['update-from']);
+            }
+        }
+
+        $this->say(
+            $options['update-from']
+                ? 'Generating fixture from ' . $options['update-from'] . '.'
+                : 'Generating fixture from clean install.'
+        );
+
         return $this->collectionBuilder()
             ->addTask(
                 $options['update-from']
