@@ -664,7 +664,7 @@ class RoboFile extends Tasks
             if ($package === 'drupal/core')
             {
                 $callback = function ($range) use ($client) {
-                    $release = $client->getLatestStableRelease('drupal', '8.x', $range);
+                    $release = $client->getLatestStableRelease('drupal', $range);
 
                     return $release ? "~$release" : $range;
                 };
@@ -675,7 +675,7 @@ class RoboFile extends Tasks
             {
                 $name = strstr($package, 'lightning_');
                 $callback = function ($range) use ($client, $name) {
-                    $release = $client->getLatestStableRelease($name, '8.x', $range);
+                    $release = $client->getLatestStableRelease($name, $range);
 
                     return $release ? "^$release" : $range;
                 };

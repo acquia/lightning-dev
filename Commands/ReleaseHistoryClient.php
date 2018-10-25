@@ -31,18 +31,16 @@ final class ReleaseHistoryClient {
    *
    * @param string $name
    *   The name of the Drupal project (e.g. 'lightning_core').
-   * @param string $api_version
-   *   The API compatibility version (e.g. '8.x').
    * @param string $range
    *   The constraint range (e.g. '3.x-dev').
    *
    * @return string
    *   The latest stable release (e.g. '3.2'), or empty string if not found.
    */
-  public function getLatestStableRelease($name, $api_version, $range) {
-    $release_history = $this->getReleaseHistory($name, $api_version);
+  public function getLatestStableRelease($name, $range) {
+    $release_history = $this->getReleaseHistory($name);
 
-    $prefix = "$api_version-";
+    $prefix = "8.x-";
     $prefix_length = strlen($prefix);
 
     // Remove the '.x-dev' suffix from range if present.
@@ -76,14 +74,12 @@ final class ReleaseHistoryClient {
    *
    * @param string $name
    *   The name of the Drupal project (e.g. 'lightning_core').
-   * @param string $api_version
-   *   The API compatibility version (e.g. '8.x').
    *
    * @return \SimpleXMLElement
    *   The parsed XML response.
    */
-  private function getReleaseHistory($name, $api_version) {
-    $uri = "https://updates.drupal.org/release-history/$name/$api_version";
+  private function getReleaseHistory($name) {
+    $uri = "https://updates.drupal.org/release-history/$name/8.x";
     $data = $this->httpClient->get($uri)->getBody()->getContents();
 
     return simplexml_load_string($data);

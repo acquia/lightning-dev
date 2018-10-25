@@ -19,8 +19,6 @@ class ReleaseHistoryClientTest extends UnitTestCase {
    *
    * @param string $name
    *   The name of the Drupal project.
-   * @param string $api_version
-   *   The API compatibility version.
    * @param string $range
    *   The constraint range.
    * @param string $release_history
@@ -30,15 +28,15 @@ class ReleaseHistoryClientTest extends UnitTestCase {
    *
    * @dataProvider getLatestStableReleaseProvider
    */
-  public function testGetLatestStableRelease($name, $api_version, $range, $release_history, $expected) {
+  public function testGetLatestStableRelease($name, $range, $release_history, $expected) {
     $client = $this->getMockBuilder(Client::class)
       ->setMethods(['get'])
       ->getMock();
     $client->expects($this->once())
       ->method('get')
-      ->with("https://updates.drupal.org/release-history/$name/$api_version")
+      ->with("https://updates.drupal.org/release-history/$name/8.x")
       ->will($this->returnValue(new Response(200, [], $release_history)));
-    $result = (new ReleaseHistoryClient($client))->getLatestStableRelease($name, $api_version, $range);
+    $result = (new ReleaseHistoryClient($client))->getLatestStableRelease($name, $range);
     $this->assertSame($expected, $result);
   }
 
@@ -73,28 +71,24 @@ class ReleaseHistoryClientTest extends UnitTestCase {
     return [
       'drupal latest' => [
         'name' => 'drupal',
-        'api_version' => '8.x',
         'range' => '8.6.x-dev',
         'release_history' => $drupal_release_history,
         'expected' => '8.6.2',
       ],
       'drupal 8.5.x-dev' => [
         'name' => 'drupal',
-        'api_version' => '8.x',
         'range' => '8.5.x-dev',
         'release_history' => $drupal_release_history,
         'expected' => '8.5.8',
       ],
       'lightning_core latest' => [
         'name' => 'lightning_core',
-        'api_version' => '8.x',
         'range' => '3.x-dev',
         'release_history' => $lightning_core_release_history,
         'expected' => '3.2',
       ],
       'lightning_core 2.x-dev' => [
         'name' => 'lightning_core',
-        'api_version' => '8.x',
         'range' => '2.x-dev',
         'release_history' => $lightning_core_release_history,
         'expected' => '2.11',
