@@ -29,14 +29,11 @@ class ReleaseHistoryClientTest extends UnitTestCase {
    * @dataProvider getLatestStableReleaseProvider
    */
   public function testGetLatestStableRelease($name, $range, $release_history, $expected) {
-    $client = $this->getMockBuilder(Client::class)
-      ->setMethods(['get'])
-      ->getMock();
-    $client->expects($this->once())
-      ->method('get')
-      ->with("https://updates.drupal.org/release-history/$name/8.x")
-      ->will($this->returnValue(new Response(200, [], $release_history)));
-    $result = (new ReleaseHistoryClient($client))->getLatestStableRelease($name, $range);
+    $client = $this->prophesize(Client::class);
+    $client->get("https://updates.drupal.org/release-history/$name/8.x")
+      ->shouldBeCalledOnce()
+      ->willReturn(new Response(200, [], $release_history));
+    $result = (new ReleaseHistoryClient($client->reveal()))->getLatestStableRelease($name, $range);
     $this->assertSame($expected, $result);
   }
 
