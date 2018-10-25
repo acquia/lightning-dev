@@ -661,6 +661,8 @@ class RoboFile extends Tasks
 
         foreach ($composer['require'] as $package => $constraint)
         {
+            $callback = NULL;
+
             if ($package === 'drupal/core')
             {
                 $callback = function ($range) use ($client) {
@@ -668,8 +670,6 @@ class RoboFile extends Tasks
 
                     return $release ? "~$release" : $range;
                 };
-                $version = (new ComposerConstraint($constraint))->mapRanges($callback);
-                $task->dependency($package, $version);
             }
             elseif (strpos($package, 'drupal/lightning_') === 0)
             {
@@ -679,6 +679,9 @@ class RoboFile extends Tasks
 
                     return $release ? "^$release" : $range;
                 };
+            }
+
+            if ($callback) {
                 $version = (new ComposerConstraint($constraint))->mapRanges($callback);
                 $task->dependency($package, $version);
             }
