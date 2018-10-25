@@ -40,28 +40,17 @@ final class ReleaseHistoryClient {
   public function getLatestStableRelease($name, $range) {
     $release_history = $this->getReleaseHistory($name);
 
-    $prefix = "8.x-";
-    $prefix_length = strlen($prefix);
-
     // Remove the '.x-dev' suffix from range if present.
-    $suffix = '.x-dev';
-    $suffix_position = -strlen($suffix);
-
-    if (substr($range, $suffix_position) === $suffix) {
-      $range = substr($range, 0, $suffix_position);
-    }
+    $range = preg_replace('#\.x-dev$#', '', $range);
+    $range_length = strlen($range);
 
     // Releases are ordered from newest to oldest.
     foreach ($release_history->releases->release as $release) {
       $release_version = (string) $release->version;
+      // Remove the '8.x-' prefix from release version if present.
+      $release_version = preg_replace('#^8\.x-#', '', $release_version);
 
-      // Remove the API version prefix from the release version if exists.
-      // For example, if the release version is '8.x-3.2', it will be '3.2'.
-      if (strncmp($release_version, $prefix, $prefix_length) === 0) {
-        $release_version = substr($release_version, $prefix_length);
-      }
-
-      if (strncmp($release_version, $range, strlen($range)) === 0) {
+      if (strncmp($release_version, $range, $range_length) === 0) {
         return $release_version;
       }
     }
