@@ -52,7 +52,7 @@ final class ComposerConstraint {
    *   '8.4.3 || ^8.5.3', it will be '8.4.x-dev || 8.5.x-dev'.
    */
   public function getCoreDev() {
-    return $this->getDev([$this, 'coreRangeToDev']);
+    return $this->mapRanges([$this, 'coreRangeToDev']);
   }
 
   /**
@@ -66,22 +66,19 @@ final class ComposerConstraint {
    *   '^1.3.0 || ^2.3.0', it will be '1.x-dev || 2.x-dev'.
    */
   public function getLightningDev() {
-    return $this->getDev([$this, 'lightningRangeToDev']);
+    return $this->mapRanges([$this, 'lightningRangeToDev']);
   }
 
   /**
-   * Returns the dev version of the constraint.
-   *
-   * In the dev version the constraint's ranges are replaced with the
-   * result of the callback.
+   * Returns the transformed constraint.
    *
    * @param callable $callback
    *   Transformation to apply to each range.
    *
    * @return string
-   *   Dev version.
+   *   Transformed constraint.
    */
-  private function getDev(callable $callback) {
+  public function mapRanges(callable $callback) {
     $ranges = $this->getRanges();
     $replace_pairs = [];
 

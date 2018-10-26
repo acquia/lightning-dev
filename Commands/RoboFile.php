@@ -5,6 +5,7 @@ namespace Acquia\Lightning\Commands;
 use cebe\markdown\GithubMarkdown;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
+use GuzzleHttp\Client;
 use Robo\Tasks;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -637,6 +638,52 @@ class RoboFile extends Tasks
             {
                 $composer_constraint = new ComposerConstraint($constraint);
                 $task->dependency($package, $composer_constraint->getLightningDev());
+            }
+        }
+
+        return $task;
+    }
+
+    /**
+     * Switches all Composer dependencies to stable.
+     *
+     * @return \Robo\Task\Composer\RequireDependency
+     *   The task to execute.
+     */
+    public function useStable ()
+    {
+        $composer = file_get_contents('composer.json');
+        $composer = json_decode($composer, TRUE);
+
+        /** @var \Robo\Task\Composer\RequireDependency $task */
+        $task = $this->taskComposerRequire()->option('no-update');
+        $client = new ReleaseHistoryClient(new Client());
+
+        foreach ($composer['require'] as $package => $constraint)
+        {
+            $callback = NULL;
+
+            if ($package === 'drupal/core')
+            {
+                $callback = function ($range) use ($client) {
+                    $release = $client->getLatestStableRelease('drupal', $range);
+
+                    return $release ? "~$release" : $range;
+                };
+            }
+            elseif (strpos($package, 'drupal/lightning_') === 0)
+            {
+                $name = strstr($package, 'lightning_');
+                $callback = function ($range) use ($client, $name) {
+                    $release = $client->getLatestStableRelease($name, $range);
+
+                    return $release ? "^$release" : $range;
+                };
+            }
+
+            if ($callback) {
+                $version = (new ComposerConstraint($constraint))->mapRanges($callback);
+                $task->dependency($package, $version);
             }
         }
 
