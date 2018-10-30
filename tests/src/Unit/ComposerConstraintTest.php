@@ -86,7 +86,11 @@ class ComposerConstraintTest extends UnitTestCase {
       ],
       'previously inserted not replaced' => [
         'constraint' => '8.5.3 || 8.5',
-        'expected' => '8.5.x-dev || 8.x-dev',
+        'expected' => '8.5.x-dev || 8.5',
+      ],
+      'incorrect format not converted' => [
+        'constraint' => '^8.5 || ^8.5.4.3',
+        'expected' => '^8.5 || ^8.5.4.3',
       ],
     ];
   }
