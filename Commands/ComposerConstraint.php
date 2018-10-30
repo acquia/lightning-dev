@@ -124,8 +124,10 @@ final class ComposerConstraint {
    */
   private function lightningRangeToDev($range) {
     $stripped = $this->stripOperators($range);
+    $replaced = preg_replace('/^(\d+)\..*/', '$1.x-dev', $stripped);
 
-    return preg_replace('/^(\d+)\..*/', '$1.x-dev', $stripped);
+    // Returns the original range if it didn't match.
+    return $stripped === $replaced ? $range : $replaced;
   }
 
   /**
