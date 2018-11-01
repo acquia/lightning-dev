@@ -91,6 +91,26 @@ class RoboFile extends Tasks
         $db_url = stripslashes($db_url);
         $settings = 'docroot/sites/default/settings.php';
 
+        $bootstrap_container_definition = <<<END
+\$settings['bootstrap_container_definition'] = [
+  'parameters' => [],
+  'services' => [
+    'database' => [
+      'class' => 'Drupal\Core\Database\Connection',
+      'factory' => 'Drupal\Core\Database\Database::getConnection',
+      'arguments' => ['default'],
+    ],
+    'cache.container' => [
+      'class' => 'Drupal\Core\Cache\MemoryBackend',
+    ],
+    'cache_tags_provider.container' => [
+      'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
+      'arguments' => ['@database'],
+    ],
+  ],
+];
+END;
+
         $tasks = $this->collectionBuilder()
             ->addTask(
                 $this->taskDrush('site-install')
@@ -105,6 +125,11 @@ class RoboFile extends Tasks
                         dirname($settings),
                         $settings,
                     ], 0755)
+            )
+            ->addTask(
+                $this->taskWriteToFile($settings)
+                    ->append()
+                    ->text($bootstrap_container_definition)
             );
 
         /** @var Finder $finder */
@@ -369,7 +394,7 @@ class RoboFile extends Tasks
      *
      * @throws \RuntimeException if $file does not exist or cannot be read.
      */
-    public function makeChangeLog($file = 'CHANGELOG.md', array $options = [
+    public function makeChangeLog ($file = 'CHANGELOG.md', array $options = [
         'format' => 'html',
         'file' => 'CHANGELOG.md',
     ])
