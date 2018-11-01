@@ -440,26 +440,48 @@ END;
      */
     public function restore ($version)
     {
-        $fixture = "tests/fixtures/$version.sql";
+        $fixture = "tests/fixtures/$version";
 
-        if (file_exists("$fixture.gz"))
+        $fixtures = array_filter(["$fixture.php.gz", "$fixture.sql.gz"], 'file_exists');
+
+        if ($fixtures)
         {
-            return $this->collectionBuilder()
+            $fixture = reset($fixtures);
+
+            $tasks = $this->collectionBuilder()
                 ->addTask(
                     $this->taskDrush('sql:drop')->option('yes')
-                )
-                ->addTask(
+                );
+
+            if (preg_match('/.php.gz$/', $fixture))
+            {
+                return $tasks->addTask(
+                    $this->taskExec(PHP_BINARY)
+                        ->args([
+                            'core/scripts/db-tools.php',
+                            'import',
+                            realpath($fixture)
+                        ])
+                        ->dir('docroot')
+                );
+            }
+            else
+            {
+                $out = dirname($fixture) . DIRECTORY_SEPARATOR . "$version.sql";
+
+                return $tasks->addTask(
                     $this->taskExec('gunzip')
-                        ->arg("$fixture.gz")
+                        ->arg($fixture)
                         ->option('keep')
                         ->option('force')
                 )
                 ->addTask(
-                    $this->taskDrush('sql:query')->option('file', "../$fixture")
+                    $this->taskDrush('sql:query')->option('file', "../$out")
                 )
                 ->completion(
-                    $this->taskFilesystemStack()->remove($fixture)
+                    $this->taskFilesystemStack()->remove($out)
                 );
+            }
         }
         else
         {
