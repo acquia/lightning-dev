@@ -80,6 +80,7 @@ class RoboFile extends Tasks
      *
      * @option $no-dev Do not install developer tools or configure test runners.
      * @option $from-config Reinstall from exported config.
+     * @option $no-components Do not install sub-components.
      *
      * @return \Robo\Contract\TaskInterface
      *   The task to execute.
@@ -87,6 +88,7 @@ class RoboFile extends Tasks
     public function install ($db_url = 'sqlite://localhost/db.sqlite', $profile = 'lightning', $base_url = NULL, array $options = [
         'no-dev' => FALSE,
         'from-config' => FALSE,
+        'no-components' => FALSE,
     ])
     {
         $db_url = stripslashes($db_url);
@@ -143,7 +145,7 @@ END;
             break;
         }
 
-        if (isset($extension, $info) && $info['type'] === 'module')
+        if (isset($extension, $info) && $info['type'] === 'module' && empty($options['no-components']))
         {
             $task = $this->taskDrush('pm-enable')
                 ->option('yes')
