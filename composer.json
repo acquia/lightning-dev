@@ -21,7 +21,7 @@
         "behat/behat": "^3.0",
         "squizlabs/php_codesniffer": "2.*",
         "se/selenium-server-standalone": "^2.53",
-        "drupal/devel": "^1.0",
+        "drupal/devel": "*",
         "drush/drush": "^9.4",
         "consolidation/robo": "^1.2",
         "drupal/console": "^1.8",
