@@ -113,6 +113,11 @@ class RoboFile extends Tasks
   ],
 ];
 END;
+        
+        $uri = $base_url;
+        if ($uri == NULL) {
+          $uri = 'http://default';
+        }
 
         $tasks = $this->collectionBuilder()
             ->addTask(
@@ -121,6 +126,7 @@ END;
                     ->option('yes')
                     ->option('account-pass', 'admin')
                     ->option('db-url', $db_url)
+                    ->option('uri', $uri)
             )
             ->addTask(
                 $this->taskFilesystemStack()
